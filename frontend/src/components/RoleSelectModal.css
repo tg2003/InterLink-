@@ -1,0 +1,236 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(10, 25, 47, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1.25rem;
+  animation: modalFadeIn 0.25s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-container {
+  background: #ffffff;
+  width: 100%;
+  max-width: 580px;
+  border-radius: 20px;
+  padding: 2.25rem;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(15, 43, 72, 0.25);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  animation: modalScaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalScaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: #f1f5f9;
+  border: none;
+  font-size: 1.5rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-subtle);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.modal-close-btn:hover {
+  background: #e2e8f0;
+  color: var(--navy-dark);
+}
+
+.modal-header {
+  margin-bottom: 1.75rem;
+  text-align: left;
+}
+
+.modal-eyebrow {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--blue-primary);
+  margin-bottom: 0.35rem;
+}
+
+.modal-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--navy-dark);
+  margin-bottom: 0.5rem;
+}
+
+.modal-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.role-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.role-option-card {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.15rem 1.25rem;
+  background: #ffffff;
+  border: 1.5px solid var(--border-light);
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-normal);
+  width: 100%;
+}
+
+.role-option-card:hover {
+  border-color: var(--blue-primary);
+  background-color: var(--blue-tint);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -3px rgba(37, 99, 235, 0.12);
+}
+
+.role-option-icon-wrapper {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, var(--blue-tint), #dbeafe);
+  color: var(--blue-primary);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-normal);
+}
+
+.role-option-card:hover .role-option-icon-wrapper {
+  background: linear-gradient(135deg, var(--blue-primary), var(--blue-hover));
+  color: #ffffff;
+}
+
+.role-option-content {
+  flex-grow: 1;
+}
+
+.role-option-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.25rem;
+}
+
+.role-option-title {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--navy-dark);
+}
+
+.role-option-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: #f1f5f9;
+  color: var(--navy-light);
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+}
+
+.role-option-card:hover .role-option-badge {
+  background: #dbeafe;
+  color: var(--blue-hover);
+}
+
+.role-option-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.role-option-arrow {
+  flex-shrink: 0;
+  color: #94a3b8;
+  transition: all var(--transition-fast);
+}
+
+.role-option-card:hover .role-option-arrow {
+  color: var(--blue-primary);
+  transform: translateX(4px);
+}
+
+.modal-footer {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.modal-login-link {
+  background: none;
+  border: none;
+  color: var(--blue-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.modal-login-link:hover {
+  color: var(--blue-hover);
+}
+
+@media (max-width: 640px) {
+  .modal-container {
+    padding: 1.5rem;
+  }
+  .role-option-card {
+    gap: 0.85rem;
+    padding: 1rem;
+  }
+  .role-option-icon-wrapper {
+    width: 44px;
+    height: 44px;
+  }
+  .role-option-icon-wrapper svg {
+    width: 22px;
+    height: 22px;
+  }
+}

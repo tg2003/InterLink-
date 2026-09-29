@@ -7,9 +7,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const authRoutes = require("./routes/authRoutes");
+
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.log(err));
+
+app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => res.send("Interlink API running"));
 
