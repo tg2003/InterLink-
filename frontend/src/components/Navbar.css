@@ -12,9 +12,11 @@
 }
 
 .navbar-header.scrolled {
-  background: rgba(255, 255, 255, 0.92);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 4px 20px -2px rgba(15, 43, 72, 0.08);
+  background: rgba(255, 255, 255, 0.45); /* initial background opacity එකම තියන්න */
+  backdrop-filter: blur(14px); /* blur effect එක maintain කරන්න */
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 20px -2px rgba(15, 43, 72, 0.08); /* scroll වෙද්දි subtle depth එකක් දෙන shadow එක */
 }
 
 .navbar-container {

@@ -263,7 +263,7 @@ export default function SignUpUniversity() {
                   className="btn btn-primary auth-submit-btn"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Submitting Application...' : 'Submit University Registration'}
+                  {isSubmitting ? 'Submitting Application...' : 'Submit University Registration for Approval'}
                 </button>
               </form>
 

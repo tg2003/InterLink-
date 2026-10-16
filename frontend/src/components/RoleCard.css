@@ -172,7 +172,7 @@
 }
 
 .role-flip-card:hover .card-feature-img {
-  transform: scale(1.05);
+  transform: scale(2.05);
 }
 
 .card-image-overlay {
@@ -187,7 +187,8 @@
 .card-tagline {
   font-size: 0.75rem;
   font-weight: 700;
-  color: #38bdf8;
+  color: #5ecefe;
+  text-shadow:0 0 30px #000000, 0 0 30px #000000;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }

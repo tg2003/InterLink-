@@ -279,7 +279,7 @@ export default function SignUpEmployer() {
                   className="btn btn-primary auth-submit-btn"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Submitting Company Profile...' : 'Complete Employer Registration'}
+                  {isSubmitting ? 'Submitting Company Profile...' : 'Submit Employer Registration for Approval'}
                 </button>
               </form>
 

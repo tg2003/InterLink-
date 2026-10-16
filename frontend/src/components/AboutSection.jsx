@@ -3,9 +3,9 @@ import './AboutSection.css';
 
 export default function AboutSection() {
   const stats = [
-    { value: '50+', label: 'Partner Universities', sub: 'Across national faculties' },
-    { value: '15,000+', label: 'Enrolled Students', sub: 'Verified talent profiles' },
-    { value: '1,200+', label: 'Registered Employers', sub: 'Actively recruiting' },
+    { value: '3+', label: 'Partner Universities', sub: 'Across national faculties' },
+    { value: '5,000+', label: 'Enrolled Students', sub: 'Verified talent profiles' },
+    { value: '100+', label: 'Registered Employers', sub: 'Actively recruiting' },
     { value: '98.6%', label: 'Placement Rate', sub: 'Streamlined approval cycle' },
   ];
 
