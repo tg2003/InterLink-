@@ -199,11 +199,168 @@
   flex-wrap: wrap;
 }
 
+.auth-card-layout.wide {
+  max-width: 760px;
+}
+
+/* Multi-Section Form Styling */
+.form-section-block {
+  background: #fbfdff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.5rem 1.5rem 1.25rem;
+  margin-bottom: 1.75rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-section-block:focus-within {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 16px -4px rgba(37, 99, 235, 0.08);
+}
+
+.form-section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  margin-bottom: 1.35rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.form-section-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--blue-tint);
+  color: var(--blue-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.form-section-badge.verification {
+  background: #ecfdf5;
+  color: #10b981;
+}
+
+.form-section-badge.hr {
+  background: #f5f3ff;
+  color: #8b5cf6;
+}
+
+.form-section-title-wrap {
+  flex-grow: 1;
+}
+
+.form-section-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--navy-dark);
+  margin-bottom: 0.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-section-subtitle {
+  font-size: 0.82rem;
+  color: var(--text-subtle);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Helper Text */
+.form-helper-text {
+  font-size: 0.78rem;
+  color: var(--text-subtle);
+  margin-top: 0.35rem;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Email Domain Warning Badge */
+.email-domain-warning {
+  margin-top: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 8px;
+  background-color: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  animation: fadeIn 0.25s ease;
+}
+
+.email-domain-warning svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #d97706;
+}
+
+/* Industry Memberships Pills */
+.membership-pills-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.membership-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: #ffffff;
+  border: 1.5px solid var(--border-light);
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.membership-pill-btn:hover {
+  border-color: var(--blue-primary);
+  color: var(--blue-primary);
+  background: var(--blue-tint);
+}
+
+.membership-pill-btn.active {
+  background: #eff6ff;
+  border-color: var(--blue-primary);
+  color: var(--blue-primary);
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.15);
+}
+
+.membership-pill-btn .check-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--blue-primary);
+}
+
 @media (max-width: 640px) {
   .auth-card-layout {
     padding: 2rem 1.5rem;
   }
+  .auth-card-layout.wide {
+    padding: 1.75rem 1.25rem;
+  }
   .auth-form-grid {
     grid-template-columns: 1fr;
   }
+  .form-section-block {
+    padding: 1.2rem 1rem;
+  }
 }
+

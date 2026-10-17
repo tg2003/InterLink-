@@ -198,18 +198,34 @@ export default function AdminEmployerVerification({ showToast, onActionComplete 
                         </div>
                         <div>
                           <div>{emp.companyName}</div>
-                          <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                            ID: {emp._id.slice(-6).toUpperCase()}
-                          </span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.15rem' }}>
+                            {emp.brNumber && (
+                              <span style={{ fontSize: '0.7rem', fontWeight: 700, background: '#f0fdf4', color: '#166534', padding: '0.1rem 0.4rem', borderRadius: 4, border: '1px solid #bbf7d0' }} title="Sri Lankan Business Registration Number">
+                                BR: {emp.brNumber}
+                              </span>
+                            )}
+                            <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                              ID: {emp._id.slice(-6).toUpperCase()}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </td>
                     <td className="admin-td">
                       <span className="badge-category">{emp.companyCategory || 'General'}</span>
+                      {emp.companySize && (
+                        <div style={{ fontSize: '0.73rem', color: '#64748b', marginTop: '0.25rem' }}>
+                          {emp.companySize}
+                        </div>
+                      )}
                     </td>
                     <td className="admin-td">
                       <div>{emp.email}</div>
-                      <span style={{ fontSize: '0.75rem', color: '#64748b' }}>HR Portal Auth</span>
+                      <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                        {emp.contactPersonName
+                          ? `${emp.contactPersonName} (${emp.contactPersonDesignation || 'HR'})`
+                          : 'HR Portal Auth'}
+                      </span>
                     </td>
                     <td className="admin-td">
                       <div>{emp.contactNumber || 'No phone'}</div>
@@ -319,24 +335,18 @@ export default function AdminEmployerVerification({ showToast, onActionComplete 
       {/* Employer Detail Modal */}
       {selectedEmp && (
         <div className="admin-modal-backdrop" onClick={() => setSelectedEmp(null)}>
-          <div className="admin-modal-card" onClick={(e) => e.stopPropagation()}>
+          <div className="admin-modal-card" style={{ maxWidth: 640 }} onClick={(e) => e.stopPropagation()}>
             <div className="admin-modal-header">
               <h3 className="admin-modal-title">Employer Organization Profile</h3>
               <button type="button" className="admin-modal-close" onClick={() => setSelectedEmp(null)}>
                 ✕
               </button>
             </div>
-            <div className="admin-modal-body">
+            <div className="admin-modal-body" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
               <div className="modal-details-grid">
                 <div className="modal-detail-item">
                   <span className="modal-detail-label">Company Name</span>
                   <span className="modal-detail-val">{selectedEmp.companyName}</span>
-                </div>
-                <div className="modal-detail-item">
-                  <span className="modal-detail-label">Industry Category</span>
-                  <span className="modal-detail-val">
-                    <span className="badge-category">{selectedEmp.companyCategory}</span>
-                  </span>
                 </div>
                 <div className="modal-detail-item">
                   <span className="modal-detail-label">Verification Status</span>
@@ -353,18 +363,111 @@ export default function AdminEmployerVerification({ showToast, onActionComplete 
                     {selectedEmp.status}
                   </span>
                 </div>
+
+                <div className="modal-detail-item">
+                  <span className="modal-detail-label">Business Registration (eROC)</span>
+                  <span className="modal-detail-val" style={{ fontFamily: 'monospace', color: '#0369a1', fontWeight: 700 }}>
+                    {selectedEmp.brNumber || 'Not provided'}
+                  </span>
+                </div>
+                <div className="modal-detail-item">
+                  <span className="modal-detail-label">Company Size (Headcount)</span>
+                  <span className="modal-detail-val">{selectedEmp.companySize || 'Not specified'}</span>
+                </div>
+
+                <div className="modal-detail-item">
+                  <span className="modal-detail-label">Industry Category</span>
+                  <span className="modal-detail-val">
+                    <span className="badge-category">{selectedEmp.companyCategory}</span>
+                  </span>
+                </div>
+                <div className="modal-detail-item">
+                  <span className="modal-detail-label">Official Website</span>
+                  <span className="modal-detail-val">
+                    {selectedEmp.websiteUrl ? (
+                      <a
+                        href={selectedEmp.websiteUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: 'var(--blue-primary)', textDecoration: 'underline', wordBreak: 'break-all' }}
+                      >
+                        {selectedEmp.websiteUrl} ↗
+                      </a>
+                    ) : (
+                      'N/A'
+                    )}
+                  </span>
+                </div>
+
+                <div className="modal-detail-item" style={{ gridColumn: '1 / -1' }}>
+                  <span className="modal-detail-label">Company LinkedIn Profile</span>
+                  <span className="modal-detail-val">
+                    {selectedEmp.linkedinUrl ? (
+                      <a
+                        href={selectedEmp.linkedinUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: 'var(--blue-primary)', textDecoration: 'underline', wordBreak: 'break-all' }}
+                      >
+                        {selectedEmp.linkedinUrl} ↗
+                      </a>
+                    ) : (
+                      'N/A'
+                    )}
+                  </span>
+                </div>
+
+                <div className="modal-detail-item" style={{ gridColumn: '1 / -1' }}>
+                  <span className="modal-detail-label">Industry Accreditations & Affiliations</span>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.3rem' }}>
+                    {selectedEmp.industryMemberships && selectedEmp.industryMemberships.length > 0 ? (
+                      selectedEmp.industryMemberships.map((mem) => (
+                        <span
+                          key={mem}
+                          style={{
+                            fontSize: '0.78rem',
+                            fontWeight: 600,
+                            background: '#eff6ff',
+                            color: '#1d4ed8',
+                            padding: '0.2rem 0.65rem',
+                            borderRadius: '9999px',
+                            border: '1px solid #bfdbfe',
+                          }}
+                        >
+                          ✓ {mem}
+                        </span>
+                      ))
+                    ) : (
+                      <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>None declared</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="modal-detail-item">
+                  <span className="modal-detail-label">Authorized HR Representative</span>
+                  <span className="modal-detail-val">
+                    {selectedEmp.contactPersonName || 'N/A'}{' '}
+                    {selectedEmp.contactPersonDesignation && (
+                      <span style={{ fontSize: '0.8rem', color: '#64748b', display: 'block', fontWeight: 500 }}>
+                        {selectedEmp.contactPersonDesignation}
+                      </span>
+                    )}
+                  </span>
+                </div>
                 <div className="modal-detail-item">
                   <span className="modal-detail-label">HR / Corporate Email</span>
                   <span className="modal-detail-val">{selectedEmp.email}</span>
                 </div>
+
                 <div className="modal-detail-item">
                   <span className="modal-detail-label">Phone Contact</span>
                   <span className="modal-detail-val">{selectedEmp.contactNumber || 'N/A'}</span>
                 </div>
                 <div className="modal-detail-item">
-                  <span className="modal-detail-label">Headquarters / Office Address</span>
+                  <span className="modal-detail-label">Headquarters Address</span>
                   <span className="modal-detail-val">{selectedEmp.address || 'Sri Lanka'}</span>
                 </div>
+
                 <div className="modal-detail-item">
                   <span className="modal-detail-label">Application Date</span>
                   <span className="modal-detail-val">

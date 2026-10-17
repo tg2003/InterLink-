@@ -188,12 +188,38 @@ exports.registerUniversity = async (req, res) => {
 // 4. Register Employer
 exports.registerEmployer = async (req, res) => {
   try {
-    const { companyName, email, password, companyCategory, contactNumber, address } = req.body;
+    const {
+      companyName,
+      email,
+      password,
+      companyCategory,
+      company_category,
+      brNumber,
+      websiteUrl,
+      linkedinUrl,
+      industryMemberships,
+      companySize,
+      contactPersonName,
+      contactPersonDesignation,
+      contactNumber,
+      address,
+    } = req.body;
 
-    if (!companyName || !email || !password || !companyCategory) {
+    const resolvedCategory = companyCategory || company_category;
+
+    if (
+      !companyName ||
+      !email ||
+      !password ||
+      !resolvedCategory ||
+      !brNumber ||
+      !companySize ||
+      !contactPersonName ||
+      !contactPersonDesignation
+    ) {
       return res.status(400).json({
         success: false,
-        message: "Please provide all required fields: companyName, email, password, and companyCategory.",
+        message: "Please provide all required fields: company name, email, password, industry category, BR/eROC number, company size, and authorized HR contact details.",
       });
     }
 
@@ -202,6 +228,28 @@ exports.registerEmployer = async (req, res) => {
         success: false,
         message: "Password must be at least 6 characters long.",
       });
+    }
+
+    // Optional website URL check
+    if (websiteUrl && websiteUrl.trim()) {
+      const cleanWeb = websiteUrl.trim();
+      if (!/^https?:\/\//i.test(cleanWeb)) {
+        return res.status(400).json({
+          success: false,
+          message: "Official Website URL must start with http:// or https://",
+        });
+      }
+    }
+
+    // Optional LinkedIn URL check
+    if (linkedinUrl && linkedinUrl.trim()) {
+      const cleanLi = linkedinUrl.trim();
+      if (!cleanLi.toLowerCase().includes("linkedin.com/company/") && !cleanLi.toLowerCase().includes("linkedin.com/in/")) {
+        return res.status(400).json({
+          success: false,
+          message: "LinkedIn profile URL must contain 'linkedin.com/company/' or 'linkedin.com/in/'.",
+        });
+      }
     }
 
     const emailInUse = await isEmailTaken(email);
@@ -215,11 +263,26 @@ exports.registerEmployer = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    // Sanitize industry memberships as array
+    let membershipsArray = [];
+    if (Array.isArray(industryMemberships)) {
+      membershipsArray = industryMemberships.filter(Boolean).map((m) => String(m).trim());
+    } else if (typeof industryMemberships === "string" && industryMemberships.trim()) {
+      membershipsArray = [industryMemberships.trim()];
+    }
+
     const employer = await Employer.create({
       companyName: companyName.trim(),
       email: email.trim().toLowerCase(),
       password: hashedPassword,
-      companyCategory: companyCategory.trim(),
+      companyCategory: resolvedCategory.trim(),
+      brNumber: brNumber.trim(),
+      websiteUrl: websiteUrl ? websiteUrl.trim() : "",
+      linkedinUrl: linkedinUrl ? linkedinUrl.trim() : "",
+      industryMemberships: membershipsArray,
+      companySize: companySize.trim(),
+      contactPersonName: contactPersonName.trim(),
+      contactPersonDesignation: contactPersonDesignation.trim(),
       contactNumber: contactNumber ? contactNumber.trim() : undefined,
       address: address ? address.trim() : undefined,
       status: "pending",
@@ -233,6 +296,8 @@ exports.registerEmployer = async (req, res) => {
         role: "employer",
         companyName: employer.companyName,
         email: employer.email,
+        brNumber: employer.brNumber,
+        companyCategory: employer.companyCategory,
         status: employer.status,
       },
     });
