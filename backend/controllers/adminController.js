@@ -246,11 +246,13 @@ exports.getEmployers = async (req, res) => {
         { email: regex },
         { companyCategory: regex },
         { address: regex },
+        { brNumber: regex },
+        { contactPersonName: regex },
       ];
     }
 
     const [employers, total, pending, approved, rejected] = await Promise.all([
-      Employer.find(filter).sort({ createdAt: -1 }),
+      Employer.find(filter).select("-password").sort({ createdAt: -1 }),
       Employer.countDocuments(),
       Employer.countDocuments({ status: "pending" }),
       Employer.countDocuments({ status: "approved" }),
