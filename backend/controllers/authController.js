@@ -447,9 +447,26 @@ exports.login = async (req, res) => {
 // 6. Get Current User info (Protected route)
 exports.getCurrentUser = async (req, res) => {
   try {
+    let userData = { ...req.user };
+
+    if (req.user && req.user.role === "employer") {
+      const employer = await Employer.findById(req.user.id).select("-password");
+      if (employer) {
+        userData = {
+          ...userData,
+          status: employer.status,
+          companyName: employer.companyName,
+          companyCategory: employer.companyCategory,
+          brNumber: employer.brNumber,
+          address: employer.address,
+          contactNumber: employer.contactNumber,
+        };
+      }
+    }
+
     res.json({
       success: true,
-      user: req.user,
+      user: userData,
     });
   } catch (err) {
     res.status(500).json({ success: false, message: "Error fetching user profile.", error: err.message });
