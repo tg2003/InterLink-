@@ -1,0 +1,233 @@
+/* ==========================================================================
+   University Portal Dedicated Stylesheet
+   Scope: Institutional Dashboard, Supervisors, Students & Progress Logs
+   ========================================================================== */
+
+/* Universal Layout Container */
+.university-view-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Category & Select Dropdown Styling */
+.university-select {
+  padding: 0.5rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-light, #e2e8f0);
+  background-color: #ffffff;
+  color: var(--text-main, #1e293b);
+  font-size: 0.85rem;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.university-select:focus {
+  border-color: var(--blue-primary, #2563eb);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* Avatar Initials Circle */
+.uni-avatar-initials {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  color: #1d4ed8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  border: 1px solid rgba(29, 78, 216, 0.15);
+}
+
+.uni-avatar-initials.sup {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  color: #b45309;
+  border-color: rgba(180, 83, 9, 0.2);
+}
+
+/* Progress Log Card Feed */
+.uni-log-card {
+  background: #ffffff;
+  border: 1px solid var(--border-light, #e2e8f0);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 2px 8px rgba(15, 43, 72, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  border-left: 4px solid var(--blue-primary, #2563eb);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.uni-log-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(15, 43, 72, 0.06);
+}
+
+.uni-log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.uni-log-student-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.uni-log-student-name {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--navy-dark, #0f172a);
+}
+
+.uni-log-student-email {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-left: 0.35rem;
+}
+
+.uni-log-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.uni-date-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+}
+
+.uni-log-body {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: #1e293b;
+  background: #f8fafc;
+  padding: 0.85rem 1.1rem;
+  border-radius: 8px;
+  border: 1px solid #f1f5f9;
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+.uni-log-feedback {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+  padding: 0.65rem 0.9rem;
+}
+
+/* Modal styling refinements */
+.uni-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1.5rem;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.uni-modal-card {
+  background: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 580px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+
+.uni-modal-header {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.uni-modal-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--navy-dark, #0f172a);
+}
+
+.uni-modal-close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: #94a3b8;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.uni-modal-close:hover {
+  color: #0f172a;
+  background: #f1f5f9;
+}
+
+.uni-modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.uni-modal-footer {
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  background: #fafafa;
+  border-top: 1px solid #f1f5f9;
+}

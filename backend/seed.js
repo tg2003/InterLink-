@@ -14,7 +14,7 @@ const ProgressLog = require("./models/ProgressLog");
 
 async function seedData() {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
+    await mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/interlink");
     console.log("MongoDB connected for seeding...");
 
     //for a fresh start
