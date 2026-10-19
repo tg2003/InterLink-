@@ -177,8 +177,8 @@ export default function UniversityStudents({ showToast }) {
                         href={student.cvUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="btn-action-view"
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}
+                        className="btn-action btn-action-view"
+                        style={{ textDecoration: 'none' }}
                       >
                         <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2">
                           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
