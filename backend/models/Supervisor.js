@@ -15,6 +15,8 @@ const supervisorSchema = new mongoose.Schema({
     enum: ["pending", "approved", "rejected"],
     default: "pending",
   },
+  department: { type: String },
+  reviewNotes: { type: String },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Supervisor", supervisorSchema);

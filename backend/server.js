@@ -10,14 +10,16 @@ app.use(express.json());
 const authRoutes = require("./routes/authRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const jobRoutes = require("./routes/jobRoutes");
+const universityRoutes = require("./routes/universityRoutes");
 
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/interlink")
   .then(() => console.log("MongoDB connected"))
-  .catch(err => console.log(err));
+  .catch(err => console.log("MongoDB connection error:", err));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/jobs", jobRoutes);
+app.use("/api/university", universityRoutes);
 
 app.get("/", (req, res) => res.send("Interlink API running"));
 

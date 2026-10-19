@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
+import universityService from '../services/universityService';
 import './AuthPages.css';
 
 export default function SignUpUniversity() {
@@ -16,9 +17,41 @@ export default function SignUpUniversity() {
     address: '',
   });
 
+  const [masterList, setMasterList] = useState([]);
+  const [selectedPreset, setSelectedPreset] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+
+  useEffect(() => {
+    const fetchMasterList = async () => {
+      try {
+        const res = await universityService.getMasterList();
+        if (res.success && res.universities) {
+          setMasterList(res.universities);
+        }
+      } catch (err) {
+        console.warn('Could not load master university list:', err);
+      }
+    };
+    fetchMasterList();
+  }, []);
+
+  const handlePresetSelect = (e) => {
+    const val = e.target.value;
+    setSelectedPreset(val);
+    if (!val || val === 'custom') {
+      return;
+    }
+    const found = masterList.find((u) => u.name === val);
+    if (found) {
+      setFormData((prev) => ({
+        ...prev,
+        universityName: found.name,
+        address: prev.address || `${found.location}, Sri Lanka`,
+      }));
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -140,11 +173,27 @@ export default function SignUpUniversity() {
 
               <form onSubmit={handleSubmit} noValidate>
                 <div className="auth-form-grid">
-                  {/* University Name */}
+                  {/* University Name & Master List Preset */}
                   <div className="form-group form-full-width">
                     <label className="form-label" htmlFor="universityName">
-                      University / Institution Name <span className="required">*</span>
+                      Select from Accredited University Master List (PB-21) <span className="required">*</span>
                     </label>
+                    <select
+                      id="masterSelect"
+                      className="form-input"
+                      value={selectedPreset}
+                      onChange={handlePresetSelect}
+                      style={{ marginBottom: '0.65rem' }}
+                    >
+                      <option value="">-- Choose from recognized universities, or select 'Custom' --</option>
+                      {masterList.map((uni) => (
+                        <option key={uni.id} value={uni.name}>
+                          {uni.name} ({uni.location} — {uni.type})
+                        </option>
+                      ))}
+                      <option value="custom">Other Institution / Custom Name (Enter below)</option>
+                    </select>
+
                     <input
                       id="universityName"
                       name="universityName"
@@ -155,6 +204,9 @@ export default function SignUpUniversity() {
                       onChange={handleChange}
                       required
                     />
+                    <small style={{ color: '#94a3b8', fontSize: '0.8rem', marginTop: '4px', display: 'block' }}>
+                      Selecting a recognized institution auto-fills the primary campus location.
+                    </small>
                   </div>
 
                   {/* Dean / Head Name */}

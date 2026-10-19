@@ -1,65 +1,179 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import DashboardLayout from './DashboardLayout';
+import universityService from '../../services/universityService';
+
+// University Sub-Views
+import UniversityOverview from './university/UniversityOverview';
+import UniversitySupervisors from './university/UniversitySupervisors';
+import UniversityStudents from './university/UniversityStudents';
+import UniversityProgressLogs from './university/UniversityProgressLogs';
+import UniversityProfileSettings from './university/UniversityProfileSettings';
 
 export default function DashboardUniversity() {
   const { user } = useAuth();
+  const [activeNav, setActiveNav] = useState('Overview');
+  const [statsData, setStatsData] = useState({
+    stats: {
+      totalStudents: 0,
+      totalSupervisors: 0,
+      approvedSupervisors: 0,
+      pendingSupervisors: 0,
+      rejectedSupervisors: 0,
+      totalProgressLogs: 0,
+    },
+    recentSupervisorRequests: [],
+    recentLogs: [],
+  });
+  const [toast, setToast] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const navItems = [
-    'Assigned Supervisors',
+    'Faculty Supervisors',
     'Enrolled Students',
-    'Partner Employers',
-    'Credit Validations',
-    'Institutional Settings',
+    'Student Progress Logs',
+    'Institutional Profile',
   ];
 
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast(null);
+    }, 4500);
+  };
+
+  const loadStats = async () => {
+    try {
+      const data = await universityService.getStats();
+      if (data.success) {
+        setStatsData({
+          stats: data.stats || {},
+          recentSupervisorRequests: data.recentSupervisorRequests || [],
+          recentLogs: data.recentLogs || [],
+        });
+      }
+    } catch (err) {
+      console.error('Failed to load university stats:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadStats();
+  }, []);
+
+  const handleApproveFromOverview = async (id, name) => {
+    try {
+      const res = await universityService.updateSupervisorStatus(id, 'approved', 'Approved from Overview');
+      if (res.success) {
+        showToast(`Supervisor "${name}" approved successfully!`, 'success');
+        loadStats();
+      }
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Failed to approve supervisor.', 'error');
+    }
+  };
+
+  const handleRejectFromOverview = async (id, name) => {
+    try {
+      const res = await universityService.updateSupervisorStatus(id, 'rejected', 'Declined from Overview');
+      if (res.success) {
+        showToast(`Supervisor "${name}" marked as rejected.`, 'info');
+        loadStats();
+      }
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Failed to reject supervisor.', 'error');
+    }
+  };
+
+  const navBadges = {
+    'Faculty Supervisors': statsData.stats.pendingSupervisors || 0,
+  };
+
+  const renderActiveView = () => {
+    switch (activeNav) {
+      case 'Faculty Supervisors':
+        return (
+          <UniversitySupervisors
+            showToast={showToast}
+            onActionComplete={loadStats}
+          />
+        );
+      case 'Enrolled Students':
+        return <UniversityStudents showToast={showToast} />;
+      case 'Student Progress Logs':
+        return <UniversityProgressLogs showToast={showToast} />;
+      case 'Institutional Profile':
+        return (
+          <UniversityProfileSettings
+            showToast={showToast}
+            onProfileUpdate={loadStats}
+          />
+        );
+      case 'Overview':
+      default:
+        return (
+          <UniversityOverview
+            stats={statsData.stats}
+            recentSupervisors={statsData.recentSupervisorRequests}
+            recentLogs={statsData.recentLogs}
+            onNavigate={(tab) => setActiveNav(tab)}
+            onApproveSupervisor={handleApproveFromOverview}
+            onRejectSupervisor={handleRejectFromOverview}
+          />
+        );
+    }
+  };
+
   return (
-    <DashboardLayout roleTitle="University" roleId="University" navItems={navItems}>
-      <div className="dashboard-banner">
-        <h1 className="banner-welcome-h1">Welcome, {user?.name || 'Academic Institution'}</h1>
-        <p className="banner-desc">
-          University Faculty Oversight & Supervision Portal. Coordinate departmental internship programs, assign faculty supervisors to students, and monitor academic compliance across partner organizations.
-        </p>
-        <span className="banner-status-tag">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-          Accredited Institution Session Verified
-        </span>
-      </div>
+    <DashboardLayout
+      roleTitle="University"
+      roleId="University"
+      navItems={navItems}
+      activeNav={activeNav}
+      onNavSelect={(nav) => setActiveNav(nav)}
+      navBadges={navBadges}
+    >
+      {/* Toast Notification Container */}
+      {toast && (
+        <div
+          className={`toast toast-${toast.type} animate-slide-in`}
+          style={{
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            padding: '12px 18px',
+            borderRadius: '8px',
+            background: toast.type === 'error' ? '#ef4444' : toast.type === 'info' ? '#3b82f6' : '#10b981',
+            color: '#ffffff',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+            fontWeight: 500,
+            fontSize: '0.9rem',
+          }}
+        >
+          <span>{toast.message}</span>
+          <button
+            onClick={() => setToast(null)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#fff',
+              cursor: 'pointer',
+              fontSize: '1.1rem',
+              lineHeight: 1,
+            }}
+          >
+            &times;
+          </button>
+        </div>
+      )}
 
-      <div className="dashboard-cards-grid">
-        <div className="dash-info-card">
-          <span className="card-label-small">Approval Status</span>
-          <div className="card-value-large" style={{ color: '#10b981' }}>Approved</div>
-          <span className="card-hint">Accredited university partner</span>
-        </div>
-        <div className="dash-info-card">
-          <span className="card-label-small">Institution Email</span>
-          <div className="card-value-large" style={{ fontSize: '1.1rem', wordBreak: 'break-all' }}>
-            {user?.email}
-          </div>
-          <span className="card-hint">Dean / Head of Dept contact</span>
-        </div>
-        <div className="dash-info-card">
-          <span className="card-label-small">Faculty Supervision</span>
-          <div className="card-value-large">Ready</div>
-          <span className="card-hint">Supervisor assignment ready</span>
-        </div>
-      </div>
-
-      <div className="dashboard-notice-box">
-        <div className="notice-icon-box">
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-          </svg>
-        </div>
-        <h2 className="notice-title">Sprint 1 Scope: University Dashboard Shell</h2>
-        <p className="notice-text">
-          Your university administrative session is verified. Features for onboarding faculty supervisors, reviewing student placement requests, and generating academic credit transcripts will be active in upcoming sprints.
-        </p>
-      </div>
+      {renderActiveView()}
     </DashboardLayout>
   );
 }
