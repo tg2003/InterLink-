@@ -307,6 +307,88 @@ exports.registerEmployer = async (req, res) => {
   }
 };
 
+// 4b. Register Supervisor (PB-06, FR-03, US-02)
+exports.registerSupervisor = async (req, res) => {
+  try {
+    const { fullName, email, password, staffRegNo, university, department, contactNumber, autoSendRequest } = req.body;
+
+    if (!fullName || !email || !password || !staffRegNo || !university) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide all required fields: fullName, email, password, staffRegNo, and university.",
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters long.",
+      });
+    }
+
+    const emailInUse = await isEmailTaken(email);
+    if (emailInUse) {
+      return res.status(409).json({
+        success: false,
+        message: "An account with this email address already exists.",
+      });
+    }
+
+    const validUni = await University.findById(university);
+    if (!validUni) {
+      return res.status(400).json({
+        success: false,
+        message: "Selected university does not exist.",
+      });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // US-02: "Send join request automatically" checkbox
+    // If false, status is "draft". If true or omitted, status is "pending".
+    const joinStatus = autoSendRequest === false ? "draft" : "pending";
+
+    const supervisor = await Supervisor.create({
+      fullName: fullName.trim(),
+      email: email.trim().toLowerCase(),
+      password: hashedPassword,
+      staffRegNo: staffRegNo.trim(),
+      university,
+      department: department ? department.trim() : undefined,
+      contactNumber: contactNumber ? contactNumber.trim() : undefined,
+      joinStatus,
+    });
+
+    const token = generateToken(supervisor, "supervisor", supervisor.fullName, supervisor.email);
+
+    return res.status(201).json({
+      success: true,
+      message: joinStatus === "pending"
+        ? "Supervisor account registered successfully and join request submitted to the University Head."
+        : "Supervisor account registered successfully. You can submit your join request from your dashboard.",
+      token,
+      user: {
+        id: supervisor._id,
+        role: "supervisor",
+        name: supervisor.fullName,
+        email: supervisor.email,
+        staffRegNo: supervisor.staffRegNo,
+        department: supervisor.department,
+        university: supervisor.university,
+        joinStatus: supervisor.joinStatus,
+      },
+    });
+  } catch (err) {
+    console.error("Supervisor registration error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to register supervisor.",
+      error: err.message,
+    });
+  }
+};
+
 // Helper to verify password (supports bcrypt as well as legacy/seed plain passwords)
 async function verifyPassword(inputPassword, storedPassword) {
   if (!inputPassword || !storedPassword) return false;
@@ -408,13 +490,6 @@ exports.login = async (req, res) => {
       }
     }
 
-    if (role === "supervisor" && user.joinStatus === "pending") {
-      return res.status(403).json({
-        success: false,
-        message: "Your supervisor account is pending university approval.",
-      });
-    }
-
     // Verify Password
     const isMatch = await verifyPassword(password, user.password);
     if (!isMatch) {
@@ -436,6 +511,8 @@ exports.login = async (req, res) => {
         name: displayName,
         email: userEmail,
         status: user.status || user.joinStatus || "active",
+        joinStatus: user.joinStatus,
+        university: user.university,
       },
     });
   } catch (err) {
@@ -460,6 +537,24 @@ exports.getCurrentUser = async (req, res) => {
           brNumber: employer.brNumber,
           address: employer.address,
           contactNumber: employer.contactNumber,
+        };
+      }
+    }
+
+    if (req.user && req.user.role === "supervisor") {
+      const supervisor = await Supervisor.findById(req.user.id)
+        .select("-password")
+        .populate("university", "universityName headName headEmail contactNumber address");
+      if (supervisor) {
+        userData = {
+          ...userData,
+          status: supervisor.joinStatus,
+          joinStatus: supervisor.joinStatus,
+          staffRegNo: supervisor.staffRegNo,
+          department: supervisor.department,
+          contactNumber: supervisor.contactNumber,
+          university: supervisor.university,
+          reviewNotes: supervisor.reviewNotes,
         };
       }
     }

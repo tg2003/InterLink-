@@ -201,6 +201,9 @@ export default function Login() {
               <Link to="/signup/university" className="role-switch-pill">
                 University
               </Link>
+              <Link to="/signup/supervisor" className="role-switch-pill">
+                Supervisor
+              </Link>
               <Link to="/signup/employer" className="role-switch-pill">
                 Employer
               </Link>

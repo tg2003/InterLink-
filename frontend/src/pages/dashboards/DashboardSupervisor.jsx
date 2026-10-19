@@ -1,68 +1,168 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import DashboardLayout from './DashboardLayout';
+import supervisorService from '../../services/supervisorService';
+
+// Sub-Views
+import SupervisorOverview from './supervisor/SupervisorOverview';
+import SupervisorStudents from './supervisor/SupervisorStudents';
+import SupervisorProgressLogs from './supervisor/SupervisorProgressLogs';
+import SupervisorProfile from './supervisor/SupervisorProfile';
 
 export default function DashboardSupervisor() {
   const { user } = useAuth();
+  const [activeNav, setActiveNav] = useState('Overview');
+  const [supervisor, setSupervisor] = useState(null);
+  const [statsData, setStatsData] = useState({
+    stats: {
+      totalStudents: 0,
+      totalProgressLogs: 0,
+      activeLoggers: 0,
+      categoriesCount: 0,
+    },
+    categoryBreakdown: [],
+    recentLogs: [],
+  });
+
+  const [toast, setToast] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const navItems = [
-    'Assigned Interns',
-    'Logbook Reviews',
-    'Mid-term Evaluations',
-    'Direct Messaging',
-    'Faculty Grading',
+    'Enrolled Interns',
+    'Student Progress Logs',
+    'Advisor Profile',
   ];
 
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast(null);
+    }, 4500);
+  };
+
+  const loadSupervisorData = async () => {
+    try {
+      setLoading(true);
+      const [statusRes, statsRes] = await Promise.allSettled([
+        supervisorService.getStatus(),
+        supervisorService.getStats(),
+      ]);
+
+      if (statusRes.status === 'fulfilled' && statusRes.value?.success) {
+        setSupervisor(statusRes.value.supervisor);
+      }
+
+      if (statsRes.status === 'fulfilled' && statsRes.value?.success) {
+        setStatsData({
+          stats: statsRes.value.stats || {},
+          categoryBreakdown: statsRes.value.categoryBreakdown || [],
+          recentLogs: statsRes.value.recentLogs || [],
+        });
+      }
+    } catch (err) {
+      console.error('Failed to load supervisor data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadSupervisorData();
+  }, []);
+
+  const isApproved = supervisor?.joinStatus === 'approved';
+
+  const navBadges = {
+    'Enrolled Interns': isApproved ? statsData.stats.totalStudents || 0 : 0,
+    'Student Progress Logs': isApproved ? statsData.stats.totalProgressLogs || 0 : 0,
+  };
+
+  const renderActiveView = () => {
+    switch (activeNav) {
+      case 'Enrolled Interns':
+        return (
+          <SupervisorStudents
+            showToast={showToast}
+          />
+        );
+      case 'Student Progress Logs':
+        return (
+          <SupervisorProgressLogs
+            showToast={showToast}
+          />
+        );
+      case 'Advisor Profile':
+        return (
+          <SupervisorProfile
+            supervisor={supervisor}
+            onProfileUpdated={loadSupervisorData}
+            showToast={showToast}
+          />
+        );
+      case 'Overview':
+      default:
+        return (
+          <SupervisorOverview
+            supervisor={supervisor}
+            stats={statsData.stats}
+            categoryBreakdown={statsData.categoryBreakdown}
+            recentLogs={statsData.recentLogs}
+            onNavigate={(tab) => setActiveNav(tab)}
+            onStatusUpdated={loadSupervisorData}
+            showToast={showToast}
+          />
+        );
+    }
+  };
+
   return (
-    <DashboardLayout roleTitle="Supervisor" roleId="Supervisor" navItems={navItems}>
-      <div className="dashboard-banner">
-        <h1 className="banner-welcome-h1">Welcome, {user?.name || 'Faculty Supervisor'}</h1>
-        <p className="banner-desc">
-          Academic Supervisor Advisory Workspace. Monitor your assigned student interns, review weekly reflective logbook entries, communicate with company mentors, and certify academic internship requirements.
-        </p>
-        <span className="banner-status-tag">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-          Faculty Advisor Session Active
-        </span>
-      </div>
+    <DashboardLayout
+      roleTitle="Supervisor"
+      roleId="Supervisor"
+      navItems={navItems}
+      activeNav={activeNav}
+      onNavSelect={(nav) => setActiveNav(nav)}
+      navBadges={navBadges}
+    >
+      {/* Toast Notification Container */}
+      {toast && (
+        <div
+          className={`toast toast-${toast.type} animate-slide-in`}
+          style={{
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            padding: '12px 18px',
+            borderRadius: '8px',
+            background: toast.type === 'error' ? '#ef4444' : toast.type === 'info' ? '#3b82f6' : '#10b981',
+            color: '#ffffff',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+            fontWeight: 500,
+            fontSize: '0.9rem',
+          }}
+        >
+          <span>{toast.message}</span>
+          <button
+            onClick={() => setToast(null)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#fff',
+              cursor: 'pointer',
+              fontSize: '1.1rem',
+              lineHeight: 1,
+            }}
+          >
+            &times;
+          </button>
+        </div>
+      )}
 
-      <div className="dashboard-cards-grid">
-        <div className="dash-info-card">
-          <span className="card-label-small">Faculty Standing</span>
-          <div className="card-value-large" style={{ color: '#10b981' }}>Approved</div>
-          <span className="card-hint">University endorsed supervisor</span>
-        </div>
-        <div className="dash-info-card">
-          <span className="card-label-small">Advisor Contact</span>
-          <div className="card-value-large" style={{ fontSize: '1.1rem', wordBreak: 'break-all' }}>
-            {user?.email}
-          </div>
-          <span className="card-hint">Institutional advisor account</span>
-        </div>
-        <div className="dash-info-card">
-          <span className="card-label-small">Review Queue</span>
-          <div className="card-value-large">All Clear</div>
-          <span className="card-hint">Logbook audits ready for Sprint 2</span>
-        </div>
-      </div>
-
-      <div className="dashboard-notice-box">
-        <div className="notice-icon-box">
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="16" y1="13" x2="8" y2="13"></line>
-            <line x1="16" y1="17" x2="8" y2="17"></line>
-            <polyline points="10 9 9 9 8 9"></polyline>
-          </svg>
-        </div>
-        <h2 className="notice-title">Sprint 1 Scope: Supervisor Dashboard Shell</h2>
-        <p className="notice-text">
-          Supervisor authentication is successfully established. Features for evaluating student submissions, tracking milestone completion percentages, and submitting final assessment scores are scheduled for Sprint 2.
-        </p>
-      </div>
+      {renderActiveView()}
     </DashboardLayout>
   );
 }
