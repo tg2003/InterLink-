@@ -25,6 +25,12 @@ export const authService = {
     return res.data;
   },
 
+  // Supervisor registration (PB-06, FR-03, US-02)
+  async registerSupervisor(supervisorData) {
+    const res = await api.post('/auth/register/supervisor', supervisorData);
+    return res.data;
+  },
+
   // Unified login
   async login(credentials) {
     const res = await api.post('/auth/login', credentials);

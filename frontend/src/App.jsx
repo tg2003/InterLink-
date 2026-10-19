@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import SignUpStudent from './pages/SignUpStudent';
 import SignUpUniversity from './pages/SignUpUniversity';
 import SignUpEmployer from './pages/SignUpEmployer';
+import SignUpSupervisor from './pages/SignUpSupervisor';
 
 // Dashboards
 import DashboardAdmin from './pages/dashboards/DashboardAdmin';
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/signup/student" element={<SignUpStudent />} />
           <Route path="/signup/university" element={<SignUpUniversity />} />
           <Route path="/signup/employer" element={<SignUpEmployer />} />
+          <Route path="/signup/supervisor" element={<SignUpSupervisor />} />
 
           {/* Role-Specific Protected Dashboards (Sprint 1 Placeholders) */}
           <Route

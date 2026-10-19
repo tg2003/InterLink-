@@ -8,6 +8,7 @@ router.get("/universities", authController.getApprovedUniversities);
 router.post("/register/student", authController.registerStudent);
 router.post("/register/university", authController.registerUniversity);
 router.post("/register/employer", authController.registerEmployer);
+router.post("/register/supervisor", authController.registerSupervisor);
 
 // General register route that routes by role
 router.post("/register", (req, res, next) => {
@@ -18,10 +19,12 @@ router.post("/register", (req, res, next) => {
     return authController.registerUniversity(req, res, next);
   } else if (role === "employer") {
     return authController.registerEmployer(req, res, next);
+  } else if (role === "supervisor") {
+    return authController.registerSupervisor(req, res, next);
   } else {
     return res.status(400).json({
       success: false,
-      message: "Invalid or missing role for registration. Supported roles: student, university, employer.",
+      message: "Invalid or missing role for registration. Supported roles: student, university, employer, supervisor.",
     });
   }
 });
