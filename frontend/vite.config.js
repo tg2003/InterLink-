@@ -11,6 +11,11 @@ export default defineConfig({
         target: 'http://localhost:5000',
         changeOrigin: true,
       },
+      // Proxy /uploads so uploaded CV PDFs are served from the Express backend
+      '/uploads': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
     },
   },
 })
