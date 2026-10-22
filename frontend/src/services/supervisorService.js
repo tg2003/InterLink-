@@ -44,7 +44,10 @@ const supervisorService = {
   },
 
   updateProfile: async (profileData) => {
-    const res = await api.put('/supervisor/profile', profileData);
+    const isFormData = profileData instanceof FormData;
+    const res = await api.put('/supervisor/profile', profileData, {
+      headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : {},
+    });
     return res.data;
   },
 };

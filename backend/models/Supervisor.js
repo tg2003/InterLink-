@@ -17,6 +17,7 @@ const supervisorSchema = new mongoose.Schema({
   },
   department: { type: String },
   contactNumber: { type: String },
+  profilePicture: { type: String, default: "" },
   reviewNotes: { type: String },
 }, { timestamps: true });
 

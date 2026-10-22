@@ -32,7 +32,19 @@ router.post("/register", (req, res, next) => {
 // Single unified login
 router.post("/login", authController.login);
 
-// Protected profile route
+// Protected profile routes (Any authenticated user)
+const { handleAvatarUpload } = require("../middleware/upload");
+
 router.get("/me", authMiddleware, authController.getCurrentUser);
+router.post("/profile-picture", authMiddleware, handleAvatarUpload, authController.uploadProfilePicture);
+router.delete("/profile-picture", authMiddleware, authController.deleteProfilePicture);
+
+// Employer Profile routes
+router.get("/employer/profile", authMiddleware, authController.getEmployerProfile);
+router.put("/employer/profile", authMiddleware, handleAvatarUpload, authController.updateEmployerProfile);
+
+// Admin Profile routes
+router.get("/admin/profile", authMiddleware, authController.getAdminProfile);
+router.put("/admin/profile", authMiddleware, handleAvatarUpload, authController.updateAdminProfile);
 
 module.exports = router;

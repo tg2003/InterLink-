@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLoadingDelay } from '../hooks/useLoadingDelay';
+import InlineLoader from '../components/InlineLoader';
 import './AuthPages.css';
 
 export default function Login() {
@@ -14,6 +16,7 @@ export default function Login() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const showLoader = useLoadingDelay(isSubmitting, 1000);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -136,7 +139,8 @@ export default function Login() {
               className="btn btn-primary auth-submit-btn"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Authenticating...' : 'Sign In to Portal'}
+              <span>{isSubmitting ? 'Authenticating' : 'Sign In to Portal'}</span>
+              {showLoader && <InlineLoader />}
             </button>
           </form>
 

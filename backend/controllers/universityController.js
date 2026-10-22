@@ -1,3 +1,5 @@
+const path = require("path");
+const fs = require("fs");
 const University = require("../models/University");
 const Supervisor = require("../models/Supervisor");
 const Student = require("../models/Student");
@@ -346,7 +348,7 @@ exports.getProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     const universityId = req.user.id;
-    const { headName, contactNumber, address, universityName } = req.body;
+    const { headName, contactNumber, address, universityName, clearProfilePicture } = req.body;
 
     const university = await University.findById(universityId);
     if (!university) {
@@ -361,6 +363,25 @@ exports.updateProfile = async (req, res) => {
     if (address !== undefined) university.address = address.trim();
     if (universityName) university.universityName = universityName.trim();
 
+    if (req.file) {
+      const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+      if (university.profilePicture && university.profilePicture.startsWith("/uploads/avatars/")) {
+        const oldPath = path.join(__dirname, "..", "uploads", "avatars", path.basename(university.profilePicture));
+        if (fs.existsSync(oldPath)) {
+          try { fs.unlinkSync(oldPath); } catch {}
+        }
+      }
+      university.profilePicture = avatarUrl;
+    } else if (clearProfilePicture === "true") {
+      if (university.profilePicture && university.profilePicture.startsWith("/uploads/avatars/")) {
+        const oldPath = path.join(__dirname, "..", "uploads", "avatars", path.basename(university.profilePicture));
+        if (fs.existsSync(oldPath)) {
+          try { fs.unlinkSync(oldPath); } catch {}
+        }
+      }
+      university.profilePicture = "";
+    }
+
     await university.save();
 
     return res.json({
@@ -373,6 +394,7 @@ exports.updateProfile = async (req, res) => {
         headEmail: university.headEmail,
         contactNumber: university.contactNumber,
         address: university.address,
+        profilePicture: university.profilePicture || "",
         status: university.status,
       },
     });

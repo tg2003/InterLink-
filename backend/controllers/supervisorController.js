@@ -1,3 +1,5 @@
+const path = require("path");
+const fs = require("fs");
 const Supervisor = require("../models/Supervisor");
 const Student = require("../models/Student");
 const ProgressLog = require("../models/ProgressLog");
@@ -344,12 +346,31 @@ exports.getAllProgressLogs = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     const supervisor = req.supervisor;
-    const { fullName, department, staffRegNo, contactNumber } = req.body;
+    const { fullName, department, staffRegNo, contactNumber, clearProfilePicture } = req.body;
 
     if (fullName && fullName.trim()) supervisor.fullName = fullName.trim();
     if (department !== undefined) supervisor.department = department.trim();
     if (staffRegNo && staffRegNo.trim()) supervisor.staffRegNo = staffRegNo.trim();
     if (contactNumber !== undefined) supervisor.contactNumber = contactNumber.trim();
+
+    if (req.file) {
+      const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+      if (supervisor.profilePicture && supervisor.profilePicture.startsWith("/uploads/avatars/")) {
+        const oldPath = path.join(__dirname, "..", "uploads", "avatars", path.basename(supervisor.profilePicture));
+        if (fs.existsSync(oldPath)) {
+          try { fs.unlinkSync(oldPath); } catch {}
+        }
+      }
+      supervisor.profilePicture = avatarUrl;
+    } else if (clearProfilePicture === "true") {
+      if (supervisor.profilePicture && supervisor.profilePicture.startsWith("/uploads/avatars/")) {
+        const oldPath = path.join(__dirname, "..", "uploads", "avatars", path.basename(supervisor.profilePicture));
+        if (fs.existsSync(oldPath)) {
+          try { fs.unlinkSync(oldPath); } catch {}
+        }
+      }
+      supervisor.profilePicture = "";
+    }
 
     await supervisor.save();
 

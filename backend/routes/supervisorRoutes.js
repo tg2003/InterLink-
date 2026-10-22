@@ -21,7 +21,8 @@ router.get("/students/:studentId/progress", supervisorController.getStudentProgr
 router.get("/progress-logs", supervisorController.getAllProgressLogs);
 
 // Profile management
+const { handleAvatarUpload } = require("../middleware/upload");
 router.get("/profile", supervisorController.getStatusAndProfile);
-router.put("/profile", supervisorController.updateProfile);
+router.put("/profile", handleAvatarUpload, supervisorController.updateProfile);
 
 module.exports = router;

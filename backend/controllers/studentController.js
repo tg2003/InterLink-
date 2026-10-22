@@ -5,7 +5,7 @@ const Student = require("../models/Student");
 const ProgressLog = require("../models/ProgressLog");
 const Application = require("../models/Application");
 const Job = require("../models/Job");
-const { CV_UPLOAD_DIR } = require("../middleware/upload");
+const { CV_UPLOAD_DIR, AVATAR_UPLOAD_DIR } = require("../middleware/upload");
 
 // ============================================================
 // 1. GET My Profile (student only — sees only their own data)
@@ -25,6 +25,7 @@ exports.getMyProfile = async (req, res) => {
         mainCategory: student.mainCategory,
         contactNumber: student.contactNumber,
         cvUrl: student.cvUrl,
+        profilePicture: student.profilePicture || "",
         bio: student.bio,
         createdAt: student.createdAt,
         updatedAt: student.updatedAt,
@@ -37,15 +38,13 @@ exports.getMyProfile = async (req, res) => {
 };
 
 // ============================================================
-// 2. UPDATE My Profile — now accepts multipart/form-data.
-//    CV arrives as req.file (PDF); text fields still in req.body.
+// 2. UPDATE My Profile — accepts multipart/form-data.
+//    Supports cvFile and profilePictureFile; text fields in req.body.
 //    Students cannot change their own email or university.
 // ============================================================
 exports.updateMyProfile = async (req, res) => {
   try {
-    // Text fields come from multipart req.body (parsed by multer)
-    const { fullName, contactNumber, bio, password, clearCv } = req.body;
-
+    const { fullName, contactNumber, bio, password, clearCv, clearProfilePicture } = req.body;
     const student = req.student;
 
     if (fullName && fullName.trim()) {
@@ -58,37 +57,49 @@ exports.updateMyProfile = async (req, res) => {
       student.bio = bio ? bio.trim() : undefined;
     }
 
+    const cvFile = req.files?.["cvFile"]?.[0] || (req.file?.fieldname === "cvFile" ? req.file : null);
+    const avatarFile = req.files?.["profilePictureFile"]?.[0] || (req.file?.fieldname === "profilePictureFile" ? req.file : null);
+
     // ── CV file handling ──────────────────────────────────────────────────
-    if (req.file) {
-      // A new PDF was uploaded — delete the previous server-side file if any
+    if (cvFile) {
       if (student.cvUrl && student.cvUrl.startsWith("/uploads/cv/")) {
         const oldFilePath = path.join(CV_UPLOAD_DIR, path.basename(student.cvUrl));
-        if (fs.existsSync(oldFilePath)) {
-          fs.unlinkSync(oldFilePath);
-        }
+        if (fs.existsSync(oldFilePath)) try { fs.unlinkSync(oldFilePath); } catch {}
       }
-      // Store as a root-relative URL served by express.static
-      student.cvUrl = `/uploads/cv/${req.file.filename}`;
+      student.cvUrl = `/uploads/cv/${cvFile.filename}`;
     } else if (clearCv === "true") {
-      // Student explicitly removed their CV
       if (student.cvUrl && student.cvUrl.startsWith("/uploads/cv/")) {
         const oldFilePath = path.join(CV_UPLOAD_DIR, path.basename(student.cvUrl));
-        if (fs.existsSync(oldFilePath)) {
-          fs.unlinkSync(oldFilePath);
-        }
+        if (fs.existsSync(oldFilePath)) try { fs.unlinkSync(oldFilePath); } catch {}
       }
       student.cvUrl = undefined;
     }
-    // If neither req.file nor clearCv — existing cvUrl is preserved unchanged
-    // ─────────────────────────────────────────────────────────────────────
+
+    // ── Profile Picture handling ──────────────────────────────────────────
+    if (avatarFile) {
+      if (student.profilePicture && student.profilePicture.startsWith("/uploads/avatars/")) {
+        const oldAvatarPath = path.join(AVATAR_UPLOAD_DIR, path.basename(student.profilePicture));
+        if (fs.existsSync(oldAvatarPath)) try { fs.unlinkSync(oldAvatarPath); } catch {}
+      }
+      student.profilePicture = `/uploads/avatars/${avatarFile.filename}`;
+    } else if (clearProfilePicture === "true") {
+      if (student.profilePicture && student.profilePicture.startsWith("/uploads/avatars/")) {
+        const oldAvatarPath = path.join(AVATAR_UPLOAD_DIR, path.basename(student.profilePicture));
+        if (fs.existsSync(oldAvatarPath)) try { fs.unlinkSync(oldAvatarPath); } catch {}
+      }
+      student.profilePicture = "";
+    }
 
     // Allow password change with proper hashing
     if (password && password.trim()) {
       if (password.trim().length < 6) {
-        // If a file was already saved, clean it up before returning the error
-        if (req.file) {
-          const newFilePath = path.join(CV_UPLOAD_DIR, req.file.filename);
-          if (fs.existsSync(newFilePath)) fs.unlinkSync(newFilePath);
+        if (cvFile) {
+          const newFilePath = path.join(CV_UPLOAD_DIR, cvFile.filename);
+          if (fs.existsSync(newFilePath)) try { fs.unlinkSync(newFilePath); } catch {}
+        }
+        if (avatarFile) {
+          const newAvatarPath = path.join(AVATAR_UPLOAD_DIR, avatarFile.filename);
+          if (fs.existsSync(newAvatarPath)) try { fs.unlinkSync(newAvatarPath); } catch {}
         }
         return res.status(400).json({
           success: false,
@@ -112,17 +123,13 @@ exports.updateMyProfile = async (req, res) => {
         mainCategory: student.mainCategory,
         contactNumber: student.contactNumber,
         cvUrl: student.cvUrl,
+        profilePicture: student.profilePicture || "",
         bio: student.bio,
         updatedAt: student.updatedAt,
       },
     });
   } catch (err) {
     console.error("updateMyProfile error:", err);
-    // If an upload succeeded but a later step failed, remove the orphaned file
-    if (req.file) {
-      const orphan = path.join(CV_UPLOAD_DIR, req.file.filename);
-      if (fs.existsSync(orphan)) fs.unlinkSync(orphan);
-    }
     res.status(500).json({ success: false, message: "Failed to update profile.", error: err.message });
   }
 };

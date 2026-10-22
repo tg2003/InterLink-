@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import supervisorService from '../../../services/supervisorService';
+import ProfilePictureUpload from '../../../components/ProfilePictureUpload';
+import { useLoadingDelay } from '../../../hooks/useLoadingDelay';
+import InlineLoader from '../../../components/InlineLoader';
 
 export default function SupervisorProfile({ supervisor, onProfileUpdated, showToast }) {
   const [formData, setFormData] = useState({
@@ -10,6 +13,7 @@ export default function SupervisorProfile({ supervisor, onProfileUpdated, showTo
   });
 
   const [saving, setSaving] = useState(false);
+  const showLoader = useLoadingDelay(saving, 1000);
   const universityObj = supervisor?.university && typeof supervisor.university === 'object' ? supervisor.university : null;
 
   const handleChange = (e) => {
@@ -70,6 +74,19 @@ export default function SupervisorProfile({ supervisor, onProfileUpdated, showTo
           <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0f172a', margin: '0 0 18px' }}>
             Personal & Academic Information
           </h3>
+
+          <div style={{ marginBottom: '20px', paddingBottom: '20px', borderBottom: '1px solid #e2e8f0' }}>
+            <ProfilePictureUpload
+              currentPicture={supervisor?.profilePicture}
+              name={supervisor?.fullName || 'Supervisor'}
+              label="Academic Advisor Photo"
+              subtitle="Upload your faculty photo. Appears in university faculty directories and student logbook reviews."
+              showToast={showToast}
+              onPictureChanged={() => {
+                if (onProfileUpdated) onProfileUpdated();
+              }}
+            />
+          </div>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
@@ -143,7 +160,8 @@ export default function SupervisorProfile({ supervisor, onProfileUpdated, showTo
                 disabled={saving}
                 style={{ minWidth: '140px' }}
               >
-                {saving ? 'Saving...' : 'Save Profile Changes'}
+                <span>{saving ? 'Saving' : 'Save Profile Changes'}</span>
+                {showLoader && <InlineLoader />}
               </button>
             </div>
           </form>

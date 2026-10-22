@@ -18,6 +18,7 @@ const employerSchema = new mongoose.Schema({
   contactPersonDesignation: { type: String, required: true },
   contactNumber: { type: String },
   address: { type: String },
+  profilePicture: { type: String, default: "" },
   status: {
     type: String,
     enum: ["pending", "approved", "rejected"],

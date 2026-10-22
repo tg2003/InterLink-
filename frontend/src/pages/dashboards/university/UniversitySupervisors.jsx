@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import universityService from '../../../services/universityService';
+import { useLoadingDelay } from '../../../hooks/useLoadingDelay';
+import InlineLoader from '../../../components/InlineLoader';
 import './University.css';
 
 export default function UniversitySupervisors({ showToast, onActionComplete }) {
@@ -10,6 +12,7 @@ export default function UniversitySupervisors({ showToast, onActionComplete }) {
   const [selectedSupervisor, setSelectedSupervisor] = useState(null);
   const [actionModal, setActionModal] = useState({ open: false, type: '', supervisor: null, notes: '' });
   const [actionLoading, setActionLoading] = useState(false);
+  const showActionLoader = useLoadingDelay(actionLoading, 1000);
 
   const fetchSupervisors = async () => {
     try {
@@ -314,7 +317,8 @@ export default function UniversitySupervisors({ showToast, onActionComplete }) {
                 onClick={handleConfirmAction}
                 disabled={actionLoading}
               >
-                {actionLoading ? 'Processing...' : `Confirm ${actionModal.type === 'approved' ? 'Approval' : 'Rejection'}`}
+                <span>{actionLoading ? 'Processing' : `Confirm ${actionModal.type === 'approved' ? 'Approval' : 'Rejection'}`}</span>
+                {showActionLoader && <InlineLoader />}
               </button>
             </div>
           </div>
