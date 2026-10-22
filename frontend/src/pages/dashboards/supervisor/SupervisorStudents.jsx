@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import supervisorService from '../../../services/supervisorService';
+import LoadingState from '../../../components/LoadingState';
 
 const CATEGORIES = [
   'All',
@@ -181,9 +182,7 @@ export default function SupervisorStudents({ showToast }) {
         }}
       >
         {loading ? (
-          <div style={{ padding: '48px', textAlign: 'center', color: '#64748b' }}>
-            <div className="dropdown-loading-spinner">Loading enrolled student interns...</div>
-          </div>
+          <LoadingState text="Loading enrolled student interns..." />
         ) : students.length > 0 ? (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
@@ -458,9 +457,7 @@ export default function SupervisorStudents({ showToast }) {
               </div>
 
               {loadingLogs ? (
-                <div style={{ padding: '30px', textAlign: 'center', color: '#64748b' }}>
-                  <div className="dropdown-loading-spinner">Loading progress log entries...</div>
-                </div>
+                <LoadingState text="Loading progress log entries..." padding="30px" />
               ) : studentLogs.length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {studentLogs.map((log) => {

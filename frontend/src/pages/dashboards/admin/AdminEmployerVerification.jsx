@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import adminService from '../../../services/adminService';
+import LoadingState from '../../../components/LoadingState';
+import InlineLoader from '../../../components/InlineLoader';
 
 export default function AdminEmployerVerification({ showToast, onActionComplete }) {
   const [employers, setEmployers] = useState([]);
@@ -158,9 +160,7 @@ export default function AdminEmployerVerification({ showToast, onActionComplete 
       {/* Employers Table */}
       <div className="admin-table-container">
         {loading ? (
-          <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
-            Loading employer records...
-          </div>
+          <LoadingState text="Loading employer records..." />
         ) : employers.length === 0 ? (
           <div className="admin-empty-state">
             <div className="admin-empty-icon">
@@ -258,7 +258,8 @@ export default function AdminEmployerVerification({ showToast, onActionComplete 
                               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5">
                                 <polyline points="20 6 9 17 4 12"/>
                               </svg>
-                              Verify
+                              <span>Verify</span>
+                              {isActionLoading && <InlineLoader size={12} />}
                             </button>
                             <button
                               type="button"
@@ -271,7 +272,8 @@ export default function AdminEmployerVerification({ showToast, onActionComplete 
                                 <line x1="18" y1="6" x2="6" y2="18"/>
                                 <line x1="6" y1="6" x2="18" y2="18"/>
                               </svg>
-                              Reject
+                              <span>Reject</span>
+                              {isActionLoading && <InlineLoader size={12} variant="dark" />}
                             </button>
                           </>
                         )}

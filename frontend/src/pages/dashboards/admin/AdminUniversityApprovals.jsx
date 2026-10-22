@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import adminService from '../../../services/adminService';
 import { useLoadingDelay } from '../../../hooks/useLoadingDelay';
 import InlineLoader from '../../../components/InlineLoader';
+import LoadingState from '../../../components/LoadingState';
 
 export default function AdminUniversityApprovals({ showToast, onActionComplete }) {
   const [universities, setUniversities] = useState([]);
@@ -152,9 +153,7 @@ export default function AdminUniversityApprovals({ showToast, onActionComplete }
       {/* Universities Table */}
       <div className="admin-table-container">
         {loading ? (
-          <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
-            Loading university records...
-          </div>
+          <LoadingState text="Loading university records..." />
         ) : universities.length === 0 ? (
           <div className="admin-empty-state">
             <div className="admin-empty-icon">

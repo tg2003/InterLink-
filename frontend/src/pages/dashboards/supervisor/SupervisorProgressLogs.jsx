@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import supervisorService from '../../../services/supervisorService';
+import LoadingState from '../../../components/LoadingState';
 
 const CATEGORIES = [
   'All',
@@ -148,8 +149,8 @@ export default function SupervisorProgressLogs({ showToast }) {
 
       {/* Logs Feed */}
       {loading ? (
-        <div style={{ padding: '48px', textAlign: 'center', color: '#64748b', background: '#ffffff', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-          <div className="dropdown-loading-spinner">Loading student daily progress logs...</div>
+        <div style={{ background: '#ffffff', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+          <LoadingState text="Loading student daily progress logs..." />
         </div>
       ) : logs.length > 0 ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>

@@ -3,6 +3,7 @@ import studentService from '../../../services/studentService';
 import ProfilePictureUpload from '../../../components/ProfilePictureUpload';
 import { useLoadingDelay } from '../../../hooks/useLoadingDelay';
 import InlineLoader from '../../../components/InlineLoader';
+import LoadingState from '../../../components/LoadingState';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -155,8 +156,8 @@ export default function StudentProfile({ showToast }) {
 
   if (loading) {
     return (
-      <div className="animate-fade-in" style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
-        Loading profile…
+      <div className="animate-fade-in">
+        <LoadingState text="Loading profile..." />
       </div>
     );
   }

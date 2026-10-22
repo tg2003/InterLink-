@@ -326,8 +326,9 @@ export default function SignUpSupervisor() {
                         Affiliated University Institution <span className="required">*</span>
                       </label>
                       {loadingUnis ? (
-                        <div style={{ color: '#64748b', fontSize: '0.9rem', padding: '0.5rem 0' }}>
-                          Loading recognized institutions...
+                        <div style={{ color: '#64748b', fontSize: '0.9rem', padding: '0.5rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <span>Loading recognized institutions...</span>
+                          <InlineLoader size={14} variant="dark" />
                         </div>
                       ) : (
                         <select

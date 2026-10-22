@@ -4,6 +4,7 @@ import { useAuth } from '../../../context/AuthContext';
 import ProfilePictureUpload from '../../../components/ProfilePictureUpload';
 import { useLoadingDelay } from '../../../hooks/useLoadingDelay';
 import InlineLoader from '../../../components/InlineLoader';
+import LoadingState from '../../../components/LoadingState';
 
 export default function EmployerProfile({ showToast = () => {} }) {
   const { user, updateUser } = useAuth();
@@ -88,12 +89,7 @@ export default function EmployerProfile({ showToast = () => {} }) {
   };
 
   if (loading) {
-    return (
-      <div style={{ textAlign: 'center', padding: '3.5rem', color: 'var(--text-muted)' }}>
-        <div className="loader" style={{ margin: '0 auto 1rem' }}></div>
-        <p>Loading company profile...</p>
-      </div>
-    );
+    return <LoadingState text="Loading company profile..." />;
   }
 
   const isVerified = profile?.status === 'approved';

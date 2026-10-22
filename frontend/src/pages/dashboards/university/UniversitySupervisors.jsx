@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import universityService from '../../../services/universityService';
 import { useLoadingDelay } from '../../../hooks/useLoadingDelay';
 import InlineLoader from '../../../components/InlineLoader';
+import LoadingState from '../../../components/LoadingState';
 import './University.css';
 
 export default function UniversitySupervisors({ showToast, onActionComplete }) {
@@ -153,10 +154,7 @@ export default function UniversitySupervisors({ showToast, onActionComplete }) {
       {/* Supervisors Table */}
       <div className="admin-table-container">
         {loading ? (
-          <div style={{ padding: '3.5rem', textAlign: 'center', color: '#64748b' }}>
-            <div className="spinner" style={{ margin: '0 auto 1rem' }}></div>
-            Loading supervisors...
-          </div>
+          <LoadingState text="Loading supervisors..." />
         ) : supervisors.length === 0 ? (
           <div className="admin-empty-state">
             <div className="admin-empty-icon">

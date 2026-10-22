@@ -3,6 +3,7 @@ import universityService from '../../../services/universityService';
 import ProfilePictureUpload from '../../../components/ProfilePictureUpload';
 import { useLoadingDelay } from '../../../hooks/useLoadingDelay';
 import InlineLoader from '../../../components/InlineLoader';
+import LoadingState from '../../../components/LoadingState';
 import './University.css';
 
 export default function UniversityProfileSettings({ showToast, onProfileUpdate }) {
@@ -73,12 +74,7 @@ export default function UniversityProfileSettings({ showToast, onProfileUpdate }
   };
 
   if (loading) {
-    return (
-      <div style={{ padding: '3.5rem', textAlign: 'center', color: '#64748b' }}>
-        <div className="spinner" style={{ margin: '0 auto 1rem' }}></div>
-        <p>Loading university profile...</p>
-      </div>
-    );
+    return <LoadingState text="Loading university profile..." />;
   }
 
   return (

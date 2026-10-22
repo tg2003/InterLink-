@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import universityService from '../../../services/universityService';
+import LoadingState from '../../../components/LoadingState';
 import './University.css';
 
 export default function UniversityProgressLogs({ showToast }) {
@@ -68,10 +69,7 @@ export default function UniversityProgressLogs({ showToast }) {
 
       {/* Progress Logs Feed */}
       {loading ? (
-        <div style={{ padding: '3.5rem', textAlign: 'center', color: '#64748b' }}>
-          <div className="spinner" style={{ margin: '0 auto 1rem' }}></div>
-          Loading daily progress feed...
-        </div>
+        <LoadingState text="Loading daily progress feed..." />
       ) : logs.length === 0 ? (
         <div className="admin-empty-state">
           <div className="admin-empty-icon">
