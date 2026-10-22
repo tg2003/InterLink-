@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import adminService from '../../../services/adminService';
+import LoadingState from '../../../components/LoadingState';
 
 export default function AdminStudentDirectory({ showToast, onActionComplete }) {
   const [students, setStudents] = useState([]);
@@ -180,9 +181,7 @@ export default function AdminStudentDirectory({ showToast, onActionComplete }) {
       {/* Students Table */}
       <div className="admin-table-container">
         {loading ? (
-          <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
-            Loading student directory...
-          </div>
+          <LoadingState text="Loading student directory..." />
         ) : students.length === 0 ? (
           <div className="admin-empty-state">
             <div className="admin-empty-icon">

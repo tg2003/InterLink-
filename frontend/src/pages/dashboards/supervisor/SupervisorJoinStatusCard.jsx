@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import supervisorService from '../../../services/supervisorService';
 import authService from '../../../services/authService';
+import InlineLoader from '../../../components/InlineLoader';
 
 export default function SupervisorJoinStatusCard({
   supervisor,
@@ -237,7 +238,10 @@ export default function SupervisorJoinStatusCard({
               University Institution <span className="req-star">*</span>
             </label>
             {loadingUnis ? (
-              <div style={{ fontSize: '0.85rem', color: '#64748b' }}>Loading institutions...</div>
+              <div style={{ fontSize: '0.85rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span>Loading institutions...</span>
+                <InlineLoader size={14} variant="dark" />
+              </div>
             ) : (
               <select
                 name="universityId"

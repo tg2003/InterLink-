@@ -276,8 +276,16 @@ export default function DashboardLayout({
 
           <div className="topbar-user-section">
             <div className="user-profile-badge">
-              <div className="user-avatar-circle">
-                {getInitials(user?.name)}
+              <div className="user-avatar-circle" style={{ overflow: 'hidden', padding: 0 }}>
+                {user?.profilePicture ? (
+                  <img
+                    src={user.profilePicture}
+                    alt={user?.name || 'User'}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                  />
+                ) : (
+                  getInitials(user?.name)
+                )}
               </div>
               <div className="user-details-text">
                 <span className="user-name-bold">{user?.name || 'Verified User'}</span>

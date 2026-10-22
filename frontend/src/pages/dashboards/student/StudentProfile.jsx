@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import studentService from '../../../services/studentService';
+import ProfilePictureUpload from '../../../components/ProfilePictureUpload';
+import { useLoadingDelay } from '../../../hooks/useLoadingDelay';
+import InlineLoader from '../../../components/InlineLoader';
+import LoadingState from '../../../components/LoadingState';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -22,6 +26,7 @@ export default function StudentProfile({ showToast }) {
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const showLoader = useLoadingDelay(saving, 1000);
 
   // Text-field form state (cv is now a file, not a text field)
   const [form, setForm] = useState({
@@ -151,8 +156,8 @@ export default function StudentProfile({ showToast }) {
 
   if (loading) {
     return (
-      <div className="animate-fade-in" style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
-        Loading profile…
+      <div className="animate-fade-in">
+        <LoadingState text="Loading profile..." />
       </div>
     );
   }
@@ -204,13 +209,22 @@ export default function StudentProfile({ showToast }) {
       >
         <div
           style={{
-            width: '72px', height: '72px', borderRadius: '50%',
+            width: '76px', height: '76px', borderRadius: '50%',
             background: 'rgba(255,255,255,0.2)', border: '3px solid rgba(255,255,255,0.5)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: '1.8rem', fontWeight: 800, flexShrink: 0,
+            overflow: 'hidden',
           }}
         >
-          {(profile?.fullName || 'S').charAt(0).toUpperCase()}
+          {profile?.profilePicture ? (
+            <img
+              src={profile.profilePicture}
+              alt={profile?.fullName || 'Student'}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          ) : (
+            (profile?.fullName || 'S').charAt(0).toUpperCase()
+          )}
         </div>
 
         <div>
@@ -232,6 +246,29 @@ export default function StudentProfile({ showToast }) {
             {profile?.university?.universityName || '—'}
           </div>
         </div>
+      </div>
+
+      {/* ── Profile Picture Upload Card ── */}
+      <div
+        style={{
+          background: '#ffffff',
+          border: '1px solid var(--border-light)',
+          borderRadius: '16px',
+          padding: '1.5rem 1.75rem',
+          marginBottom: '1.75rem',
+          boxShadow: 'var(--shadow-sm)',
+        }}
+      >
+        <ProfilePictureUpload
+          currentPicture={profile?.profilePicture}
+          name={profile?.fullName || 'Student'}
+          label="Student Profile Picture"
+          subtitle="Upload your professional photo. Appears in job applications and student directory."
+          showToast={showToast}
+          onPictureChanged={(newPic) => {
+            setProfile((prev) => ({ ...prev, profilePicture: newPic }));
+          }}
+        />
       </div>
 
       {/* ── View mode ── */}
@@ -535,7 +572,8 @@ export default function StudentProfile({ showToast }) {
               disabled={saving}
               id="student-save-profile-btn"
             >
-              {saving ? 'Saving…' : 'Save Changes'}
+              <span>{saving ? 'Saving' : 'Save Changes'}</span>
+              {showLoader && <InlineLoader />}
             </button>
             <button
               type="button"

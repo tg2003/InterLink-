@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import universityService from '../../../services/universityService';
+import ProfilePictureUpload from '../../../components/ProfilePictureUpload';
+import { useLoadingDelay } from '../../../hooks/useLoadingDelay';
+import InlineLoader from '../../../components/InlineLoader';
+import LoadingState from '../../../components/LoadingState';
 import './University.css';
 
 export default function UniversityProfileSettings({ showToast, onProfileUpdate }) {
@@ -9,11 +13,13 @@ export default function UniversityProfileSettings({ showToast, onProfileUpdate }
     headEmail: '',
     contactNumber: '',
     address: '',
+    profilePicture: '',
     status: '',
   });
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const showLoader = useLoadingDelay(saving, 1000);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -27,6 +33,7 @@ export default function UniversityProfileSettings({ showToast, onProfileUpdate }
             headEmail: res.university.headEmail || '',
             contactNumber: res.university.contactNumber || '',
             address: res.university.address || '',
+            profilePicture: res.university.profilePicture || '',
             status: res.university.status || 'pending',
           });
         }
@@ -67,12 +74,7 @@ export default function UniversityProfileSettings({ showToast, onProfileUpdate }
   };
 
   if (loading) {
-    return (
-      <div style={{ padding: '3.5rem', textAlign: 'center', color: '#64748b' }}>
-        <div className="spinner" style={{ margin: '0 auto 1rem' }}></div>
-        <p>Loading university profile...</p>
-      </div>
-    );
+    return <LoadingState text="Loading university profile..." />;
   }
 
   return (
@@ -94,6 +96,21 @@ export default function UniversityProfileSettings({ showToast, onProfileUpdate }
       </div>
 
       <div className="admin-table-container" style={{ padding: '1.75rem 2rem', margin: 0 }}>
+        {/* Institutional Logo / Seal Upload */}
+        <div style={{ marginBottom: '1.75rem', paddingBottom: '1.5rem', borderBottom: '1px solid #e2e8f0' }}>
+          <ProfilePictureUpload
+            currentPicture={formData.profilePicture}
+            name={formData.universityName || 'University'}
+            label="Institutional Logo / Seal"
+            subtitle="Upload official crest, university emblem, or institutional seal."
+            showToast={showToast}
+            onPictureChanged={(newPic) => {
+              setFormData((prev) => ({ ...prev, profilePicture: newPic }));
+              if (onProfileUpdate) onProfileUpdate({ ...formData, profilePicture: newPic });
+            }}
+          />
+        </div>
+
         <form onSubmit={handleSubmit}>
           <div className="auth-form-grid" style={{ gap: '1.25rem' }}>
             {/* University Name */}
@@ -201,7 +218,8 @@ export default function UniversityProfileSettings({ showToast, onProfileUpdate }
               disabled={saving}
               style={{ minWidth: '170px' }}
             >
-              {saving ? 'Saving...' : 'Save Profile Changes'}
+              <span>{saving ? 'Saving' : 'Save Profile Changes'}</span>
+              {showLoader && <InlineLoader />}
             </button>
           </div>
         </form>

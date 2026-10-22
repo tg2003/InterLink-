@@ -15,7 +15,8 @@ router.patch("/supervisors/:id/status", universityController.updateSupervisorSta
 router.get("/students", universityController.getEnrolledStudents);
 router.get("/students/:studentId/progress", universityController.getStudentProgressLogs);
 router.get("/progress-logs", universityController.getAllProgressLogs);
+const { handleAvatarUpload } = require("../middleware/upload");
 router.get("/profile", universityController.getProfile);
-router.put("/profile", universityController.updateProfile);
+router.put("/profile", handleAvatarUpload, universityController.updateProfile);
 
 module.exports = router;

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
+import { useLoadingDelay } from '../hooks/useLoadingDelay';
+import InlineLoader from '../components/InlineLoader';
 import './AuthPages.css';
 
 export default function SignUpSupervisor() {
@@ -23,6 +25,7 @@ export default function SignUpSupervisor() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const showLoader = useLoadingDelay(isSubmitting, 1000);
   const [submittedStatus, setSubmittedStatus] = useState('pending');
 
   // Fetch approved universities for dropdown (FR-03)
@@ -323,8 +326,9 @@ export default function SignUpSupervisor() {
                         Affiliated University Institution <span className="required">*</span>
                       </label>
                       {loadingUnis ? (
-                        <div style={{ color: '#64748b', fontSize: '0.9rem', padding: '0.5rem 0' }}>
-                          Loading recognized institutions...
+                        <div style={{ color: '#64748b', fontSize: '0.9rem', padding: '0.5rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <span>Loading recognized institutions...</span>
+                          <InlineLoader size={14} variant="dark" />
                         </div>
                       ) : (
                         <select
@@ -447,7 +451,8 @@ export default function SignUpSupervisor() {
                   className="btn btn-primary btn-lg auth-submit-btn"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Submitting Registration...' : 'Complete Supervisor Registration'}
+                  <span>{isSubmitting ? 'Submitting Registration' : 'Complete Supervisor Registration'}</span>
+                  {showLoader && <InlineLoader />}
                 </button>
               </form>
 

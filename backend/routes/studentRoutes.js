@@ -3,14 +3,14 @@ const router = express.Router();
 const studentController = require("../controllers/studentController");
 const studentAuth = require("../middleware/studentAuth");
 const authMiddleware = require("../middleware/auth");
-const { handleCvUpload } = require("../middleware/upload");
+const { handleStudentProfileUpload } = require("../middleware/upload");
 
 // ─── Student-only Protected Routes (require valid student JWT) ──────────────
 
 // Profile
 router.get("/profile", studentAuth, studentController.getMyProfile);
-// handleCvUpload parses multipart/form-data and attaches req.file for the PDF
-router.put("/profile", studentAuth, handleCvUpload, studentController.updateMyProfile);
+// handleStudentProfileUpload parses multipart/form-data with cvFile and profilePictureFile
+router.put("/profile", studentAuth, handleStudentProfileUpload, studentController.updateMyProfile);
 
 // Progress Logs
 router.post("/progress-logs", studentAuth, studentController.addProgressLog);

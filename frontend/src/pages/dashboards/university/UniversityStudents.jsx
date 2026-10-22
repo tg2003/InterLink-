@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import universityService from '../../../services/universityService';
+import LoadingState from '../../../components/LoadingState';
 import './University.css';
 
 export default function UniversityStudents({ showToast }) {
@@ -106,10 +107,7 @@ export default function UniversityStudents({ showToast }) {
       {/* Students Table */}
       <div className="admin-table-container">
         {loading ? (
-          <div style={{ padding: '3.5rem', textAlign: 'center', color: '#64748b' }}>
-            <div className="spinner" style={{ margin: '0 auto 1rem' }}></div>
-            Loading enrolled students...
-          </div>
+          <LoadingState text="Loading enrolled students..." />
         ) : students.length === 0 ? (
           <div className="admin-empty-state">
             <div className="admin-empty-icon">
@@ -226,10 +224,7 @@ export default function UniversityStudents({ showToast }) {
             </div>
             <div className="uni-modal-body" style={{ maxHeight: '62vh' }}>
               {logsLoading ? (
-                <div style={{ textAlign: 'center', padding: '2.5rem' }}>
-                  <div className="spinner" style={{ margin: '0 auto 1rem' }}></div>
-                  <p style={{ color: '#64748b' }}>Loading student logs...</p>
-                </div>
+                <LoadingState text="Loading student logs..." padding="2rem" />
               ) : selectedStudentLogs.logs.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '2.5rem', color: '#64748b' }}>
                   <p>This student has not submitted any daily progress logs yet.</p>

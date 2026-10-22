@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import jobService from '../../../services/jobService';
 import studentService from '../../../services/studentService';
+import LoadingState from '../../../components/LoadingState';
 
 export default function StudentJobSearch({ showToast }) {
   const [jobs, setJobs] = useState([]);
@@ -263,7 +264,7 @@ export default function StudentJobSearch({ showToast }) {
 
       {/* Jobs Grid */}
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>Loading vacancies…</div>
+        <LoadingState text="Loading vacancies..." />
       ) : filtered.length === 0 ? (
         <div className="dashboard-notice-box">
           <div className="notice-icon-box" style={{ background: '#eff6ff', color: 'var(--blue-primary)' }}>

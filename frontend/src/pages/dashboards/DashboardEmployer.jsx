@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import DashboardLayout from './DashboardLayout';
 import EmployerPostJob from './employer/EmployerPostJob';
+import EmployerProfile from './employer/EmployerProfile';
 import jobService from '../../services/jobService';
 
 export default function DashboardEmployer() {
@@ -95,9 +96,11 @@ export default function DashboardEmployer() {
           </div>
         );
 
+      case 'Company Profile':
+        return <EmployerProfile showToast={showToast} />;
+
       case 'Active Interns':
       case 'Supervisor Coordination':
-      case 'Company Profile':
         return (
           <div className="dashboard-notice-box animate-fade-in">
             <div className="notice-icon-box">

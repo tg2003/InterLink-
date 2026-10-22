@@ -26,7 +26,12 @@ const universityRoutes = require("./routes/universityRoutes");
 const supervisorRoutes = require("./routes/supervisorRoutes");
 const studentRoutes = require("./routes/studentRoutes");
 
-mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/interlink")
+mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/interlink", {
+  maxPoolSize: 10,
+  minPoolSize: 2,
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+})
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.log("MongoDB connection error:", err));
 

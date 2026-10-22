@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
 import universityService from '../services/universityService';
+import { useLoadingDelay } from '../hooks/useLoadingDelay';
+import InlineLoader from '../components/InlineLoader';
 import './AuthPages.css';
 
 export default function SignUpUniversity() {
@@ -22,6 +24,7 @@ export default function SignUpUniversity() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const showLoader = useLoadingDelay(isSubmitting, 1000);
 
   useEffect(() => {
     const fetchMasterList = async () => {
@@ -315,7 +318,8 @@ export default function SignUpUniversity() {
                   className="btn btn-primary auth-submit-btn"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Submitting Application...' : 'Submit University Registration for Approval'}
+                  <span>{isSubmitting ? 'Submitting Application' : 'Submit University Registration for Approval'}</span>
+                  {showLoader && <InlineLoader />}
                 </button>
               </form>
 

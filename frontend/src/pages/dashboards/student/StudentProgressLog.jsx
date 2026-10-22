@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import studentService from '../../../services/studentService';
+import LoadingState from '../../../components/LoadingState';
+import { useLoadingDelay } from '../../../hooks/useLoadingDelay';
+import InlineLoader from '../../../components/InlineLoader';
 
 export default function StudentProgressLog({ showToast }) {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const showSubmittingLoader = useLoadingDelay(submitting, 1000);
   const [form, setForm] = useState({ date: '', description: '' });
   const [showForm, setShowForm] = useState(false);
 
@@ -172,7 +176,8 @@ export default function StudentProgressLog({ showToast }) {
               disabled={submitting}
               id="student-submit-log-btn"
             >
-              {submitting ? 'Saving…' : 'Save Entry'}
+              <span>{submitting ? 'Saving' : 'Save Entry'}</span>
+              {showSubmittingLoader && <InlineLoader />}
             </button>
             <button
               type="button"
@@ -190,7 +195,7 @@ export default function StudentProgressLog({ showToast }) {
 
       {/* Log Entries List */}
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>Loading logs…</div>
+        <LoadingState text="Loading logs..." />
       ) : logs.length === 0 ? (
         <div className="dashboard-notice-box">
           <div className="notice-icon-box" style={{ background: '#eff6ff', color: 'var(--blue-primary)' }}>

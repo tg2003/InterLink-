@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import adminService from '../../../services/adminService';
+import LoadingState from '../../../components/LoadingState';
 
 export default function AdminSystemAuditLogs({ showToast }) {
   const [logs, setLogs] = useState([]);
@@ -166,9 +167,7 @@ export default function AdminSystemAuditLogs({ showToast }) {
       {/* Audit Log Stream */}
       <div style={{ marginBottom: '2rem' }}>
         {loading ? (
-          <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
-            Fetching system audit logs...
-          </div>
+          <LoadingState text="Fetching system audit logs..." />
         ) : logs.length === 0 ? (
           <div className="admin-empty-state" style={{ background: '#ffffff', borderRadius: 16, border: '1px solid var(--border-light)' }}>
             <div className="admin-empty-icon">
