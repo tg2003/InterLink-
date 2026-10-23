@@ -683,61 +683,124 @@
   gap: 0.4rem;
 }
 
-.btn-action {
+.btn-action,
+.btn-action-approve,
+.btn-action-reject,
+.btn-action-view,
+.btn-action-delete {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.35rem;
-  font-size: 0.78rem;
+  font-family: inherit;
+  font-size: 0.8rem;
   font-weight: 600;
-  padding: 0.4rem 0.75rem;
+  line-height: 1.25;
+  padding: 0.42rem 0.82rem;
   border-radius: 8px;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: all 0.15s ease;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  user-select: none;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-action:disabled,
+.btn-action-approve:disabled,
+.btn-action-reject:disabled,
+.btn-action-view:disabled,
+.btn-action-delete:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+  box-shadow: none;
+  transform: none;
 }
 
 .btn-action-approve {
   background: #10b981;
   color: #ffffff;
+  border-color: #059669;
+  box-shadow: 0 1px 2px rgba(16, 185, 129, 0.2);
 }
 
 .btn-action-approve:hover {
   background: #059669;
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  border-color: #047857;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-action-approve:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.2);
 }
 
 .btn-action-reject {
-  background: #fee2e2;
-  color: #b91c1c;
-  border-color: #fca5a5;
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+  box-shadow: 0 1px 2px rgba(220, 38, 38, 0.08);
 }
 
 .btn-action-reject:hover {
   background: #ef4444;
   color: #ffffff;
-  border-color: #ef4444;
+  border-color: #dc2626;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-action-reject:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(239, 68, 68, 0.2);
 }
 
 .btn-action-view {
-  background: var(--bg-alt);
-  color: var(--text-muted);
-  border-color: var(--border-light);
+  background: var(--bg-alt, #f8fafc);
+  color: var(--text-main, #334155);
+  border-color: var(--border-light, #e2e8f0);
 }
 
 .btn-action-view:hover {
-  background: #e2e8f0;
-  color: var(--text-main);
+  background: #f1f5f9;
+  color: var(--blue-primary, #2563eb);
+  border-color: #cbd5e1;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+
+.btn-action-view:active {
+  transform: translateY(0);
 }
 
 .btn-action-delete {
   background: transparent;
   color: #94a3b8;
-  padding: 0.4rem;
+  padding: 0.42rem 0.6rem;
+  box-shadow: none;
 }
 
 .btn-action-delete:hover {
   color: #ef4444;
   background: #fee2e2;
+  transform: translateY(-1px);
+}
+
+.btn-action svg,
+.btn-action-approve svg,
+.btn-action-reject svg,
+.btn-action-view svg,
+.btn-action-delete svg {
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 /* Empty State */

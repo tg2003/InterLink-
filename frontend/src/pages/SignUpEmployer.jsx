@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
+import { useLoadingDelay } from '../hooks/useLoadingDelay';
+import InlineLoader from '../components/InlineLoader';
 import './AuthPages.css';
 
 const INDUSTRY_CATEGORIES = [
@@ -72,6 +74,7 @@ export default function SignUpEmployer() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const showLoader = useLoadingDelay(isSubmitting, 1000);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -580,7 +583,8 @@ export default function SignUpEmployer() {
                   className="btn btn-primary auth-submit-btn"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Submitting Company Profile...' : 'Submit Employer Registration for Approval'}
+                  <span>{isSubmitting ? 'Submitting Company Profile' : 'Submit Employer Registration for Approval'}</span>
+                  {showLoader && <InlineLoader />}
                 </button>
               </form>
 

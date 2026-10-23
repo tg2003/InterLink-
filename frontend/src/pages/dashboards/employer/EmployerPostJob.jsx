@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import jobService from '../../../services/jobService';
+import LoadingState from '../../../components/LoadingState';
+import InlineLoader from '../../../components/InlineLoader';
 import './EmployerPostJob.css';
 
 const INDUSTRY_CATEGORIES = [
@@ -504,7 +506,10 @@ export default function EmployerPostJob({ user, showToast, onJobCreated }) {
               disabled={loading || !isVerified}
             >
               {loading ? (
-                'Publishing Vacancy...'
+                <>
+                  <span>Publishing Vacancy...</span>
+                  <InlineLoader />
+                </>
               ) : !isVerified ? (
                 'Publishing Locked (Pending Admin Verification)'
               ) : (
@@ -581,9 +586,7 @@ export default function EmployerPostJob({ user, showToast, onJobCreated }) {
       {activeTab === 'manage' && (
         <div className="posted-jobs-container">
           {fetchLoading ? (
-            <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>
-              Loading your posted vacancies...
-            </div>
+            <LoadingState text="Loading your posted vacancies..." />
           ) : myJobs.length === 0 ? (
             <div className="admin-empty-state">
               <div className="admin-empty-icon">
@@ -651,7 +654,8 @@ export default function EmployerPostJob({ user, showToast, onJobCreated }) {
                         onClick={() => handleToggleAvailability(job)}
                         title={job.availability ? 'Close Applications' : 'Re-open Applications'}
                       >
-                        {job.availability ? 'Pause / Close' : 'Re-open'}
+                        <span>{job.availability ? 'Pause / Close' : 'Re-open'}</span>
+                        {isActionLoading && <InlineLoader size={12} variant="dark" />}
                       </button>
 
                       <button

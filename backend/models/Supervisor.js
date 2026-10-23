@@ -12,9 +12,13 @@ const supervisorSchema = new mongoose.Schema({
   },
   joinStatus: {
     type: String,
-    enum: ["pending", "approved", "rejected"],
+    enum: ["pending", "approved", "rejected", "draft"],
     default: "pending",
   },
+  department: { type: String },
+  contactNumber: { type: String },
+  profilePicture: { type: String, default: "" },
+  reviewNotes: { type: String },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Supervisor", supervisorSchema);

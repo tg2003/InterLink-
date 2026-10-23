@@ -10,6 +10,7 @@ import AdminEmployerVerification from './admin/AdminEmployerVerification';
 import AdminStudentDirectory from './admin/AdminStudentDirectory';
 import AdminSystemAuditLogs from './admin/AdminSystemAuditLogs';
 import AdminPlatformSettings from './admin/AdminPlatformSettings';
+import AdminProfile from './admin/AdminProfile';
 
 export default function DashboardAdmin() {
   const { user } = useAuth();
@@ -23,6 +24,7 @@ export default function DashboardAdmin() {
     'Student Directory',
     'System Audit Logs',
     'Platform Settings',
+    'Admin Profile',
   ];
 
   const showToast = (message, type = 'success') => {
@@ -86,6 +88,12 @@ export default function DashboardAdmin() {
           <AdminPlatformSettings
             showToast={showToast}
             onActionComplete={loadStats}
+          />
+        );
+      case 'Admin Profile':
+        return (
+          <AdminProfile
+            showToast={showToast}
           />
         );
       case 'Overview':

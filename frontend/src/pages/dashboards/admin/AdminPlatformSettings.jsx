@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import adminService from '../../../services/adminService';
 import { useAuth } from '../../../context/AuthContext';
+import LoadingState from '../../../components/LoadingState';
+import { useLoadingDelay } from '../../../hooks/useLoadingDelay';
+import InlineLoader from '../../../components/InlineLoader';
 
 export default function AdminPlatformSettings({ showToast, onActionComplete }) {
   const { user } = useAuth();
@@ -18,6 +21,7 @@ export default function AdminPlatformSettings({ showToast, onActionComplete }) {
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const showSavingLoader = useLoadingDelay(saving, 1000);
   const [pingResult, setPingResult] = useState(null);
   const [pingLoading, setPingLoading] = useState(false);
 
@@ -105,11 +109,7 @@ export default function AdminPlatformSettings({ showToast, onActionComplete }) {
   };
 
   if (loading) {
-    return (
-      <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
-        Loading platform governance configuration...
-      </div>
-    );
+    return <LoadingState text="Loading platform governance configuration..." />;
   }
 
   return (
@@ -136,7 +136,8 @@ export default function AdminPlatformSettings({ showToast, onActionComplete }) {
             onClick={handleSave}
             disabled={saving}
           >
-            {saving ? 'Saving Changes...' : 'Save Platform Settings'}
+            <span>{saving ? 'Saving...' : 'Save Platform Settings'}</span>
+            {showSavingLoader && <InlineLoader />}
           </button>
         </div>
       </div>
@@ -409,7 +410,8 @@ export default function AdminPlatformSettings({ showToast, onActionComplete }) {
             className="btn btn-primary"
             disabled={saving}
           >
-            {saving ? 'Saving...' : 'Save Platform Settings'}
+            <span>{saving ? 'Saving...' : 'Save Platform Settings'}</span>
+            {showSavingLoader && <InlineLoader />}
           </button>
         </div>
       </form>

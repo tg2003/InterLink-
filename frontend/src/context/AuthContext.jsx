@@ -75,6 +75,16 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUser = (updatedData) => {
+    setUser((prev) => {
+      const next = { ...prev, ...updatedData };
+      try {
+        localStorage.setItem('interlink_user', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -84,6 +94,7 @@ export const AuthProvider = ({ children }) => {
         loading,
         loginUser,
         logoutUser,
+        updateUser,
         getDashboardPath,
       }}
     >

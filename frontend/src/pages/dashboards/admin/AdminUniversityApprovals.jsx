@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import adminService from '../../../services/adminService';
+import { useLoadingDelay } from '../../../hooks/useLoadingDelay';
+import InlineLoader from '../../../components/InlineLoader';
+import LoadingState from '../../../components/LoadingState';
 
 export default function AdminUniversityApprovals({ showToast, onActionComplete }) {
   const [universities, setUniversities] = useState([]);
@@ -10,6 +13,7 @@ export default function AdminUniversityApprovals({ showToast, onActionComplete }
   const [selectedUni, setSelectedUni] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [actionLoadingId, setActionLoadingId] = useState(null);
+  const showActionLoader = useLoadingDelay(Boolean(actionLoadingId), 1000);
 
   const fetchUniversities = async () => {
     try {
@@ -149,9 +153,7 @@ export default function AdminUniversityApprovals({ showToast, onActionComplete }
       {/* Universities Table */}
       <div className="admin-table-container">
         {loading ? (
-          <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
-            Loading university records...
-          </div>
+          <LoadingState text="Loading university records..." />
         ) : universities.length === 0 ? (
           <div className="admin-empty-state">
             <div className="admin-empty-icon">
@@ -227,19 +229,20 @@ export default function AdminUniversityApprovals({ showToast, onActionComplete }
                             <button
                               type="button"
                               className="btn-action btn-action-approve"
-                              disabled={isActionLoading}
+                              disabled={Boolean(actionLoadingId)}
                               onClick={() => handleStatusChange(uni._id, 'approved', uni.universityName)}
                               title="Approve University"
                             >
                               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5">
                                 <polyline points="20 6 9 17 4 12"/>
                               </svg>
-                              Approve
+                              <span>Approve</span>
+                              {actionLoadingId === uni._id && showActionLoader && <InlineLoader size={12} />}
                             </button>
                             <button
                               type="button"
                               className="btn-action btn-action-reject"
-                              disabled={isActionLoading}
+                              disabled={Boolean(actionLoadingId)}
                               onClick={() => handleStatusChange(uni._id, 'rejected', uni.universityName)}
                               title="Reject Registration"
                             >
@@ -247,7 +250,8 @@ export default function AdminUniversityApprovals({ showToast, onActionComplete }
                                 <line x1="18" y1="6" x2="6" y2="18"/>
                                 <line x1="6" y1="6" x2="18" y2="18"/>
                               </svg>
-                              Reject
+                              <span>Reject</span>
+                              {actionLoadingId === uni._id && showActionLoader && <InlineLoader size={12} variant="dark" />}
                             </button>
                           </>
                         )}
