@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Job = require("../models/Job");
 const Employer = require("../models/Employer");
 const Application = require("../models/Application");
@@ -108,13 +109,19 @@ exports.getEmployerJobs = async (req, res) => {
       .populate("employer", "companyName email address companyCategory websiteUrl status")
       .sort({ createdAt: -1 });
 
-    // Attach applicant count to each job
+    // Attach applicant counts to each job (total + still-pending)
     const jobsWithStats = await Promise.all(
       jobs.map(async (job) => {
-        const applicantCount = await Application.countDocuments({ job: job._id });
+        const [applicantCount, pendingCount, acceptedCount] = await Promise.all([
+          Application.countDocuments({ job: job._id }),
+          Application.countDocuments({ job: job._id, status: "pending" }),
+          Application.countDocuments({ job: job._id, status: "accepted" }),
+        ]);
         return {
           ...job.toObject(),
           applicantCount,
+          pendingCount,
+          acceptedCount,
         };
       })
     );
@@ -264,5 +271,159 @@ exports.getAllPublicJobs = async (req, res) => {
     res.json({ success: true, count: jobs.length, jobs });
   } catch (err) {
     res.status(500).json({ success: false, message: "Failed to fetch vacancies.", error: err.message });
+  }
+};
+
+// 10. Active interns (accepted applications) of the employer, grouped by internship position
+exports.getActiveInterns = async (req, res) => {
+  try {
+    if (!req.user || req.user.role !== "employer") {
+      return res.status(403).json({ success: false, message: "Access restricted to employers." });
+    }
+
+    const jobs = await Job.find({ employer: req.user.id }).select("title category duration");
+    const jobIds = jobs.map((j) => j._id);
+
+    const accepted = await Application.find({ job: { $in: jobIds }, status: "accepted" })
+      .populate({
+        path: "student",
+        select: "fullName email contactNumber mainCategory cvUrl profilePicture university",
+        populate: { path: "university", select: "universityName" },
+      })
+      .sort({ updatedAt: -1 });
+
+    const positions = jobs
+      .map((job) => ({
+        jobId: job._id,
+        title: job.title,
+        category: job.category,
+        duration: job.duration,
+        interns: accepted
+          .filter((a) => a.student && String(a.job) === String(job._id))
+          .map((a) => ({ applicationId: a._id, startedAt: a.updatedAt, student: a.student })),
+      }))
+      .filter((p) => p.interns.length > 0);
+
+    res.json({
+      success: true,
+      total: positions.reduce((n, p) => n + p.interns.length, 0),
+      positions,
+    });
+  } catch (err) {
+    console.error("Error fetching active interns:", err);
+    res.status(500).json({ success: false, message: "Failed to load active interns.", error: err.message });
+  }
+};
+
+// 8. Get applicants for all vacancies posted by the logged-in employer
+exports.getEmployerApplicants = async (req, res) => {
+  try {
+    if (!req.user || req.user.role !== "employer") {
+      return res.status(403).json({ success: false, message: "Access restricted to employers." });
+    }
+
+    const jobs = await Job.find({ employer: req.user.id }).select("_id");
+    const jobIds = jobs.map((j) => j._id);
+
+    const applications = await Application.find({ job: { $in: jobIds }, status: "pending" })
+      .populate({
+        path: "student",
+        select: "fullName email contactNumber mainCategory cvUrl bio profilePicture university",
+        populate: { path: "university", select: "universityName" },
+      })
+      .populate("job", "title category")
+      .sort({ createdAt: -1 });
+
+    const valid = applications.filter((a) => a.student && a.job);
+
+    res.json({
+      success: true,
+      count: valid.length,
+      applications: valid,
+    });
+  } catch (err) {
+    console.error("Error fetching applicants:", err);
+    res.status(500).json({ success: false, message: "Failed to load applicants.", error: err.message });
+  }
+};
+
+// 9. Accept / reject an application for one of the employer's vacancies
+exports.updateApplicationStatus = async (req, res) => {
+  try {
+    if (!req.user || req.user.role !== "employer") {
+      return res.status(403).json({ success: false, message: "Access restricted to employers." });
+    }
+    const { status } = req.body;
+    if (!["pending", "accepted", "rejected"].includes(status)) {
+      return res.status(400).json({ success: false, message: "Invalid status." });
+    }
+
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ success: false, message: "Invalid application id." });
+    }
+
+    const application = await Application.findById(req.params.id).populate("job", "employer title openings");
+    if (!application || !application.job || String(application.job.employer) !== String(req.user.id)) {
+      return res.status(404).json({ success: false, message: "Application not found or unauthorized." });
+    }
+
+    if (application.status === status) {
+      return res.json({ success: true, message: `Application is already ${status}.`, status, autoClosedIds: [] });
+    }
+
+    let autoClosedIds = [];
+
+    if (status === "accepted") {
+      // Guard 1: a student can only hold one active internship (across all companies)
+      const otherAccepted = await Application.findOne({
+        student: application.student,
+        status: "accepted",
+        _id: { $ne: application._id },
+      }).populate({ path: "job", select: "title employer", populate: { path: "employer", select: "companyName" } });
+
+      if (otherAccepted) {
+        const sameCompany = otherAccepted.job && String(otherAccepted.job.employer?._id) === String(req.user.id);
+        return res.status(409).json({
+          success: false,
+          message: sameCompany
+            ? `This student is already an active intern at your company (${otherAccepted.job.title}).`
+            : "This student has already been hired as an intern by another company.",
+        });
+      }
+
+      // Guard 2: respect the vacancy's openings limit
+      const openings = application.job.openings || 1;
+      const filled = await Application.countDocuments({ job: application.job._id, status: "accepted" });
+      if (filled >= openings) {
+        return res.status(409).json({
+          success: false,
+          message: `All ${openings} opening${openings === 1 ? "" : "s"} for "${application.job.title}" are already filled.`,
+        });
+      }
+
+      application.status = "accepted";
+      await application.save();
+
+      // Auto-close the student's other pending applications (any company)
+      const others = await Application.find({
+        student: application.student,
+        status: "pending",
+        _id: { $ne: application._id },
+      }).select("_id");
+      autoClosedIds = others.map((o) => o._id);
+      if (autoClosedIds.length) {
+        await Application.updateMany({ _id: { $in: autoClosedIds } }, { $set: { status: "rejected" } });
+      }
+    } else {
+      application.status = status;
+      await application.save();
+    }
+
+    const extra = autoClosedIds.length
+      ? ` ${autoClosedIds.length} other pending application${autoClosedIds.length === 1 ? " was" : "s were"} closed automatically.`
+      : "";
+    res.json({ success: true, message: `Application marked as ${status}.${extra}`, status, autoClosedIds });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Failed to update application.", error: err.message });
   }
 };
