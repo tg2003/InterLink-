@@ -42,6 +42,24 @@ export const jobService = {
     const res = await api.get('/jobs', { params });
     return res.data;
   },
+
+  // Get accepted (active) interns grouped by internship position
+  async getActiveInterns() {
+    const res = await api.get('/jobs/active-interns');
+    return res.data;
+  },
+
+  // Get all student applications for the employer's vacancies
+  async getApplicants() {
+    const res = await api.get('/jobs/applicants');
+    return res.data;
+  },
+
+  // Accept / reject an application
+  async updateApplicationStatus(id, status) {
+    const res = await api.patch(`/jobs/applications/${id}/status`, { status });
+    return res.data;
+  },
 };
 
 export default jobService;

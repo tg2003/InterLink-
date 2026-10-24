@@ -3,6 +3,8 @@ import { useAuth } from '../../context/AuthContext';
 import DashboardLayout from './DashboardLayout';
 import EmployerPostJob from './employer/EmployerPostJob';
 import EmployerProfile from './employer/EmployerProfile';
+import EmployerApplicants from './employer/EmployerApplicants';
+import EmployerActiveInterns from './employer/EmployerActiveInterns';
 import jobService from '../../services/jobService';
 
 export default function DashboardEmployer() {
@@ -14,9 +16,8 @@ export default function DashboardEmployer() {
 
   const navItems = [
     'Post Internship Vacancy',
-    'Talent Applicant Pool',
+    'Vacancy Applicants',
     'Active Interns',
-    'Supervisor Coordination',
     'Company Profile',
   ];
 
@@ -32,7 +33,7 @@ export default function DashboardEmployer() {
       const res = await jobService.getMyJobs();
       if (res.success) {
         setVacancyCount(res.jobs.length);
-        const totalApplicants = res.jobs.reduce((acc, j) => acc + (j.applicantCount || 0), 0);
+        const totalApplicants = res.jobs.reduce((acc, j) => acc + (j.pendingCount || 0), 0);
         setApplicantCount(totalApplicants);
       }
     } catch {
@@ -48,7 +49,7 @@ export default function DashboardEmployer() {
 
   const navBadges = {
     'Post Internship Vacancy': vacancyCount,
-    'Talent Applicant Pool': applicantCount,
+    'Vacancy Applicants': applicantCount,
   };
 
   const renderContent = () => {
@@ -62,68 +63,14 @@ export default function DashboardEmployer() {
           />
         );
 
-      case 'Talent Applicant Pool':
-        return (
-          <div className="dashboard-notice-box animate-fade-in">
-            <div className="notice-icon-box" style={{ background: '#eff6ff', color: '#2563eb' }}>
-              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                <circle cx="8.5" cy="7" r="4"/>
-                <line x1="20" y1="8" x2="20" y2="14"/>
-                <line x1="23" y1="11" x2="17" y2="11"/>
-              </svg>
-            </div>
-            <h2 className="notice-title">Talent Applicant Pool Management</h2>
-            <p className="notice-text">
-              Review and screen verified undergraduate candidates matched with your industry domain. Once students apply to your published internship vacancies, candidate profiles, GPA, CV dossiers, and university endorsements will appear here.
-            </p>
-            <div style={{ marginTop: '1.25rem', display: 'flex', gap: '0.75rem' }}>
-              <button
-                type="button"
-                className="btn btn-primary btn-sm"
-                onClick={() => setActiveNav('Post Internship Vacancy')}
-              >
-                Publish New Vacancy
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={() => setActiveNav('Overview')}
-              >
-                Back to Overview
-              </button>
-            </div>
-          </div>
-        );
+      case 'Vacancy Applicants':
+        return <EmployerApplicants showToast={showToast} onChanged={loadJobStats} />;
 
       case 'Company Profile':
         return <EmployerProfile showToast={showToast} />;
 
       case 'Active Interns':
-      case 'Supervisor Coordination':
-        return (
-          <div className="dashboard-notice-box animate-fade-in">
-            <div className="notice-icon-box">
-              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
-                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-              </svg>
-            </div>
-            <h2 className="notice-title">{activeNav}</h2>
-            <p className="notice-text">
-              This module is scheduled for full deployment in upcoming releases. Current Sprint priority: <strong>Employer Corporate Registration Verification (PB-02)</strong> and <strong>Internship Vacancy Publishing (FR-15)</strong>.
-            </p>
-            <div style={{ marginTop: '1.25rem' }}>
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={() => setActiveNav('Overview')}
-              >
-                Back to Overview
-              </button>
-            </div>
-          </div>
-        );
+        return <EmployerActiveInterns key={activeNav} showToast={showToast} />;
 
       case 'Overview':
       default:
@@ -167,8 +114,8 @@ export default function DashboardEmployer() {
                     onClick={() => setActiveNav('Post Internship Vacancy')}
                   >
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <line x1="12" y1="5" x2="12" y2="19"/>
-                      <line x1="5" y1="12" x2="19" y2="12"/>
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
                     </svg>
                     Post Internship Vacancy
                   </button>
@@ -206,7 +153,7 @@ export default function DashboardEmployer() {
               <div
                 className="dash-info-card"
                 style={{ cursor: 'pointer' }}
-                onClick={() => setActiveNav('Talent Applicant Pool')}
+                onClick={() => setActiveNav('Vacancy Applicants')}
               >
                 <span className="card-label-small">Student Applicants</span>
                 <div className="card-value-large">

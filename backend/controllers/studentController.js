@@ -221,6 +221,15 @@ exports.applyForJob = async (req, res) => {
       return res.status(400).json({ success: false, message: "This internship vacancy is no longer accepting applications." });
     }
 
+    // A student who already holds an active internship cannot apply elsewhere
+    const hired = await Application.exists({ student: req.student._id, status: "accepted" });
+    if (hired) {
+      return res.status(409).json({
+        success: false,
+        message: "You already have an active internship, so you can't apply for other vacancies.",
+      });
+    }
+
     // Check for duplicate application (unique index on job+student also guards this)
     const existing = await Application.findOne({ job: jobId, student: req.student._id });
     if (existing) {
