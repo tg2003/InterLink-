@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="interlink-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="50%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#1e3a8a" />
+    </linearGradient>
+    <linearGradient id="accent-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#60a5fa" />
+    </linearGradient>
+  </defs>
+  <!-- Interlocking rings/nodes -->
+  <circle cx="38" cy="50" r="24" stroke="url(#interlink-grad)" stroke-width="8" stroke-linecap="round" stroke-dasharray="110 40" />
+  <circle cx="62" cy="50" r="24" stroke="url(#accent-grad)" stroke-width="8" stroke-linecap="round" stroke-dasharray="110 40" transform="rotate(180 62 50)" />
+  <circle cx="50" cy="50" r="6" fill="#2563eb" />
+</svg>

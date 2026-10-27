@@ -12,6 +12,7 @@ const studentSchema = new mongoose.Schema({
   mainCategory: { type: String, required: true }, // e.g. "IT", "Business"
   contactNumber: { type: String },
   cvUrl: { type: String },
+  profilePicture: { type: String, default: "" },
   bio: { type: String },
 }, { timestamps: true });
 

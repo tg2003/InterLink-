@@ -1,0 +1,341 @@
+.role-cards-section {
+  position: relative;
+  padding: 5rem 0 4rem;
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+.curved-bg-wave-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.role-cards-container {
+  position: relative;
+  z-index: 2;
+}
+
+.role-cards-header {
+  text-align: center;
+  max-width: 750px;
+  margin: 0 auto 3.5rem;
+}
+
+.section-eyebrow {
+  display: inline-block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--blue-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: var(--blue-tint);
+  padding: 0.3rem 0.85rem;
+  border-radius: 9999px;
+  margin-bottom: 0.75rem;
+}
+
+.section-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--navy-dark);
+  margin-bottom: 0.85rem;
+  letter-spacing: -0.02em;
+}
+
+.section-subtitle {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.interaction-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: var(--blue-hover);
+  background: rgba(37, 99, 235, 0.06);
+  padding: 0.35rem 0.9rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(37, 99, 235, 0.15);
+}
+
+/* 3 Cards Grid */
+.role-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  align-items: stretch;
+}
+
+.role-card-column {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* 3D Flip Card Container */
+.role-flip-card {
+  perspective: 1200px;
+  width: 100%;
+  height: 480px;
+  cursor: pointer;
+  outline: none;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-style: preserve-3d;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px -5px rgba(15, 43, 72, 0.08), 0 4px 10px -2px rgba(15, 43, 72, 0.03);
+}
+
+/* Desktop Hover Flip */
+@media (hover: hover) and (pointer: fine) {
+
+  .role-flip-card:hover .flip-card-inner,
+  .role-flip-card:focus-visible .flip-card-inner {
+    transform: rotateY(180deg);
+  }
+}
+
+/* Touch / Class Flip */
+.role-flip-card.is-flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+/* Front & Back Faces */
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1.5px solid var(--border-light);
+  background: #ffffff;
+}
+
+/* Front Face */
+.flip-card-front {
+  z-index: 2;
+  transform: rotateY(0deg);
+}
+
+.card-number-badge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 5;
+  width: 34px;
+  height: 34px;
+  background: rgba(10, 25, 47, 0.85);
+  backdrop-filter: blur(6px);
+  color: #ffffff;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 0.95rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+}
+
+.card-image-box {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  background-color: var(--blue-tint);
+  overflow: hidden;
+}
+
+.card-feature-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.role-flip-card:hover .card-feature-img {
+  transform: scale(2.05);
+}
+
+.card-image-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(to top, rgba(15, 43, 72, 0.85), transparent);
+}
+
+.card-tagline {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #5ecefe;
+  text-shadow: 0 0 30px #000000, 0 0 30px #000000;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.card-front-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: space-between;
+}
+
+.card-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--navy-dark);
+  margin-bottom: 0.5rem;
+}
+
+.card-highlight {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.flip-prompt {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--blue-primary);
+  margin-top: auto;
+}
+
+/* Back Face */
+.flip-card-back {
+  transform: rotateY(180deg);
+  background: linear-gradient(145deg, #ffffff, #f0f7ff);
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-color: rgba(37, 99, 235, 0.3);
+}
+
+.card-back-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.card-back-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--blue-primary);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.card-back-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--navy-dark);
+}
+
+.benefits-headline {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--blue-hover);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.85rem;
+}
+
+.benefits-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.88rem;
+  color: var(--text-main);
+  line-height: 1.4;
+}
+
+.check-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--blue-primary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.back-register-btn {
+  width: 100%;
+}
+
+/* Direct Action Button Below Card (Wireframe specification) */
+.role-direct-action {
+  margin-top: 1.25rem;
+  width: 100%;
+}
+
+.direct-register-btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-weight: 700;
+  border: 1.5px solid var(--border-light);
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(15, 43, 72, 0.04);
+}
+
+.direct-register-btn:hover {
+  border-color: var(--blue-primary);
+  background-color: var(--blue-tint);
+  color: var(--blue-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.15);
+}
+
+@media (max-width: 992px) {
+  .role-cards-grid {
+    grid-template-columns: 1fr;
+    max-width: 480px;
+    margin: 0 auto;
+    gap: 2.5rem;
+  }
+
+  .role-flip-card {
+    height: 460px;
+  }
+}
