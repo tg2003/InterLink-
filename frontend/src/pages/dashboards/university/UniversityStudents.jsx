@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import universityService from '../../../services/universityService';
 import LoadingState from '../../../components/LoadingState';
 import './University.css';
@@ -31,6 +32,24 @@ export default function UniversityStudents({ showToast }) {
   useEffect(() => {
     fetchStudents();
   }, [searchQuery, categoryFilter]);
+
+  // Lock background scroll & enable ESC key close when progress logs modal is active
+  useEffect(() => {
+    if (selectedStudentLogs) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e) => {
+        if (e.key === 'Escape') {
+          setSelectedStudentLogs(null);
+        }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [selectedStudentLogs]);
 
   const handleOpenStudentLogs = async (student) => {
     try {
@@ -206,8 +225,13 @@ export default function UniversityStudents({ showToast }) {
       </div>
 
       {/* Progress Logs Modal for Selected Student */}
-      {selectedStudentLogs && (
-        <div className="uni-modal-overlay" onClick={() => setSelectedStudentLogs(null)}>
+      {selectedStudentLogs && typeof document !== 'undefined' && createPortal(
+        <div
+          className="uni-modal-overlay"
+          onClick={() => setSelectedStudentLogs(null)}
+          role="dialog"
+          aria-modal="true"
+        >
           <div className="uni-modal-card" style={{ maxWidth: '680px' }} onClick={(e) => e.stopPropagation()}>
             <div className="uni-modal-header">
               <div>
@@ -218,7 +242,12 @@ export default function UniversityStudents({ showToast }) {
                   {selectedStudentLogs.student?.email} • <span className="badge-category">{selectedStudentLogs.student?.mainCategory}</span>
                 </span>
               </div>
-              <button type="button" className="uni-modal-close" onClick={() => setSelectedStudentLogs(null)}>
+              <button
+                type="button"
+                className="uni-modal-close"
+                onClick={() => setSelectedStudentLogs(null)}
+                aria-label="Close modal"
+              >
                 &times;
               </button>
             </div>
@@ -260,7 +289,8 @@ export default function UniversityStudents({ showToast }) {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import universityService from '../../../services/universityService';
 import { useLoadingDelay } from '../../../hooks/useLoadingDelay';
 import InlineLoader from '../../../components/InlineLoader';
@@ -35,6 +36,26 @@ export default function UniversitySupervisors({ showToast, onActionComplete }) {
   useEffect(() => {
     fetchSupervisors();
   }, [statusFilter, searchQuery]);
+
+  // Lock background scroll & handle ESC key close when either modal is active
+  const isAnyModalOpen = actionModal.open || !!selectedSupervisor;
+  useEffect(() => {
+    if (isAnyModalOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e) => {
+        if (e.key === 'Escape') {
+          if (actionModal.open) setActionModal({ open: false, type: '', supervisor: null, notes: '' });
+          if (selectedSupervisor) setSelectedSupervisor(null);
+        }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [isAnyModalOpen, actionModal.open, selectedSupervisor]);
 
   const handleOpenActionModal = (supervisor, type) => {
     setActionModal({
@@ -263,8 +284,13 @@ export default function UniversitySupervisors({ showToast, onActionComplete }) {
       </div>
 
       {/* Action Modal (Approve / Reject) */}
-      {actionModal.open && (
-        <div className="uni-modal-overlay" onClick={() => setActionModal({ open: false, type: '', supervisor: null, notes: '' })}>
+      {actionModal.open && typeof document !== 'undefined' && createPortal(
+        <div
+          className="uni-modal-overlay"
+          onClick={() => setActionModal({ open: false, type: '', supervisor: null, notes: '' })}
+          role="dialog"
+          aria-modal="true"
+        >
           <div className="uni-modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="uni-modal-header">
               <h3 className="uni-modal-title">
@@ -274,6 +300,7 @@ export default function UniversitySupervisors({ showToast, onActionComplete }) {
                 type="button"
                 className="uni-modal-close"
                 onClick={() => setActionModal({ open: false, type: '', supervisor: null, notes: '' })}
+                aria-label="Close modal"
               >
                 &times;
               </button>
@@ -320,16 +347,27 @@ export default function UniversitySupervisors({ showToast, onActionComplete }) {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Details View Modal */}
-      {selectedSupervisor && (
-        <div className="uni-modal-overlay" onClick={() => setSelectedSupervisor(null)}>
+      {selectedSupervisor && typeof document !== 'undefined' && createPortal(
+        <div
+          className="uni-modal-overlay"
+          onClick={() => setSelectedSupervisor(null)}
+          role="dialog"
+          aria-modal="true"
+        >
           <div className="uni-modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="uni-modal-header">
               <h3 className="uni-modal-title">Supervisor Profile</h3>
-              <button type="button" className="uni-modal-close" onClick={() => setSelectedSupervisor(null)}>
+              <button
+                type="button"
+                className="uni-modal-close"
+                onClick={() => setSelectedSupervisor(null)}
+                aria-label="Close modal"
+              >
                 &times;
               </button>
             </div>
@@ -387,7 +425,8 @@ export default function UniversitySupervisors({ showToast, onActionComplete }) {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
