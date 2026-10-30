@@ -368,11 +368,11 @@ exports.getStudents = async (req, res) => {
     }
 
     const students = await Student.find(filter)
-      .populate("university", "universityName")
+      .populate("university", "universityName profilePicture")
       .sort({ createdAt: -1 });
 
     const totalStudents = await Student.countDocuments();
-    const universitiesList = await University.find().select("_id universityName").sort({ universityName: 1 });
+    const universitiesList = await University.find().select("_id universityName profilePicture").sort({ universityName: 1 });
 
     res.json({
       success: true,

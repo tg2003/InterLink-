@@ -345,7 +345,7 @@ exports.getStudentProgressLogs = async (req, res) => {
       });
     }
 
-    const student = await Student.findById(studentId).select("fullName email university mainCategory").populate("university", "universityName");
+    const student = await Student.findById(studentId).select("fullName email university mainCategory").populate("university", "universityName profilePicture");
     if (!student) {
       return res.status(404).json({ success: false, message: "Student not found." });
     }
