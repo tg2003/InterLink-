@@ -14,11 +14,12 @@
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(4px);
+
   }
+
   to {
     opacity: 1;
-    transform: translateY(0);
+
   }
 }
 
@@ -153,33 +154,61 @@
 }
 
 /* Modal styling refinements */
+@keyframes uniModalOverlayFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes uniModalCardScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
 .uni-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(15, 23, 42, 0.55);
-  backdrop-filter: blur(4px);
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 99999;
   padding: 1.5rem;
-  animation: fadeIn 0.15s ease-out;
+  box-sizing: border-box;
+  animation: uniModalOverlayFadeIn 0.2s ease-out;
 }
 
 .uni-modal-card {
   background: #ffffff;
   border-radius: 16px;
   width: 100%;
-  max-width: 580px;
+  max-width: 680px;
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.2);
   overflow: hidden;
+  margin: auto;
+  animation: uniModalCardScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .uni-modal-header {

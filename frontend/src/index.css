@@ -50,7 +50,9 @@
   --transition-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -58,7 +60,8 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 80px; /* Accounts for fixed navbar */
+  scroll-padding-top: 80px;
+  /* Accounts for fixed navbar */
   font-family: var(--font-body);
   color: var(--text-main);
   background-color: var(--bg-main);
@@ -80,7 +83,12 @@ body {
 }
 
 /* Typography Defaults */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-heading);
   color: var(--navy-dark);
   line-height: 1.25;
@@ -183,11 +191,12 @@ a {
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(12px);
+
   }
+
   to {
     opacity: 1;
-    transform: translateY(0);
+
   }
 }
 
@@ -292,7 +301,7 @@ a {
 }
 
 .loader::before,
-.loader::after {    
+.loader::after {
   content: "";
   grid-area: 1/1;
   margin: 2px;
@@ -312,8 +321,10 @@ a {
   border-right-color: var(--navy-dark, #0f2b48);
 }
 
-@keyframes l15 { 
-  100% { transform: rotate(1turn); }
+@keyframes l15 {
+  100% {
+    transform: rotate(1turn);
+  }
 }
 
 /* Compact loader for avatar upload overlay */
@@ -321,6 +332,7 @@ a {
   width: 24px;
   border-width: 2.5px;
 }
+
 .loader.loader-sm::after {
   margin: 4px;
 }

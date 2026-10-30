@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import universityService from '../../../services/universityService';
 import { useLoadingDelay } from '../../../hooks/useLoadingDelay';
 import InlineLoader from '../../../components/InlineLoader';
@@ -14,6 +15,32 @@ export default function UniversitySupervisors({ showToast, onActionComplete }) {
   const [actionModal, setActionModal] = useState({ open: false, type: '', supervisor: null, notes: '' });
   const [actionLoading, setActionLoading] = useState(false);
   const showActionLoader = useLoadingDelay(actionLoading, 1000);
+
+  // Lock body scroll and handle Escape key when modals are open
+  useEffect(() => {
+    const isModalOpen = actionModal.open || !!selectedSupervisor;
+    if (!isModalOpen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (actionModal.open) {
+          setActionModal({ open: false, type: '', supervisor: null, notes: '' });
+        } else if (selectedSupervisor) {
+          setSelectedSupervisor(null);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [actionModal.open, selectedSupervisor]);
 
   const fetchSupervisors = async () => {
     try {
@@ -86,10 +113,10 @@ export default function UniversitySupervisors({ showToast, onActionComplete }) {
         <div>
           <h2 className="admin-section-title">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ color: 'var(--blue-primary)' }}>
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
             Faculty Supervisors & Join Requests
           </h2>
@@ -138,8 +165,8 @@ export default function UniversitySupervisors({ showToast, onActionComplete }) {
 
         <div className="admin-search-wrapper">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#94a3b8" strokeWidth="2">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
           <input
             type="text"
@@ -159,8 +186,8 @@ export default function UniversitySupervisors({ showToast, onActionComplete }) {
           <div className="admin-empty-state">
             <div className="admin-empty-icon">
               <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
               </svg>
             </div>
             <h4 style={{ margin: '0 0 0.4rem', color: 'var(--navy-dark)' }}>No Supervisors Found</h4>
@@ -263,131 +290,133 @@ export default function UniversitySupervisors({ showToast, onActionComplete }) {
       </div>
 
       {/* Action Modal (Approve / Reject) */}
-      {actionModal.open && (
-        <div className="uni-modal-overlay" onClick={() => setActionModal({ open: false, type: '', supervisor: null, notes: '' })}>
-          <div className="uni-modal-card" onClick={(e) => e.stopPropagation()}>
-            <div className="uni-modal-header">
-              <h3 className="uni-modal-title">
-                {actionModal.type === 'approved' ? 'Approve Supervisor Join Request' : 'Reject Supervisor Join Request'}
-              </h3>
-              <button
-                type="button"
-                className="uni-modal-close"
-                onClick={() => setActionModal({ open: false, type: '', supervisor: null, notes: '' })}
-              >
-                &times;
-              </button>
-            </div>
-            <div className="uni-modal-body">
-              <p style={{ color: '#475569', fontSize: '0.92rem', margin: 0, lineHeight: 1.5 }}>
-                You are about to <strong style={{ color: actionModal.type === 'approved' ? '#059669' : '#b91c1c' }}>{actionModal.type}</strong> faculty supervisor{' '}
-                <strong style={{ color: 'var(--navy-dark)' }}>{actionModal.supervisor?.fullName}</strong> (Staff ID:{' '}
-                <code>{actionModal.supervisor?.staffRegNo}</code>).
-              </p>
+          {actionModal.open && createPortal(
+            <div className="uni-modal-overlay" onClick={() => setActionModal({ open: false, type: '', supervisor: null, notes: '' })} role="dialog" aria-modal="true">
+              <div className="uni-modal-card" onClick={(e) => e.stopPropagation()}>
+                <div className="uni-modal-header">
+                  <h3 className="uni-modal-title">
+                    {actionModal.type === 'approved' ? 'Approve Supervisor Join Request' : 'Reject Supervisor Join Request'}
+                  </h3>
+                  <button
+                    type="button"
+                    className="uni-modal-close"
+                    onClick={() => setActionModal({ open: false, type: '', supervisor: null, notes: '' })}
+                  >
+                    &times;
+                  </button>
+                </div>
+                <div className="uni-modal-body">
+                  <p style={{ color: '#475569', fontSize: '0.92rem', margin: 0, lineHeight: 1.5 }}>
+                    You are about to <strong style={{ color: actionModal.type === 'approved' ? '#059669' : '#b91c1c' }}>{actionModal.type}</strong> faculty supervisor{' '}
+                    <strong style={{ color: 'var(--navy-dark)' }}>{actionModal.supervisor?.fullName}</strong> (Staff ID:{' '}
+                    <code>{actionModal.supervisor?.staffRegNo}</code>).
+                  </p>
 
-              <div>
-                <label className="form-label" htmlFor="modalReviewNotes" style={{ fontSize: '0.85rem', marginBottom: '0.4rem', display: 'block' }}>
-                  Institutional Notes / Justification (Optional)
-                </label>
-                <textarea
-                  id="modalReviewNotes"
-                  className="form-input"
-                  rows={3}
-                  placeholder="e.g. Verified with faculty HR records..."
-                  value={actionModal.notes}
-                  onChange={(e) => setActionModal((prev) => ({ ...prev, notes: e.target.value }))}
-                />
+                  <div>
+                    <label className="form-label" htmlFor="modalReviewNotes" style={{ fontSize: '0.85rem', marginBottom: '0.4rem', display: 'block' }}>
+                      Institutional Notes / Justification (Optional)
+                    </label>
+                    <textarea
+                      id="modalReviewNotes"
+                      className="form-input"
+                      rows={3}
+                      placeholder="e.g. Verified with faculty HR records..."
+                      value={actionModal.notes}
+                      onChange={(e) => setActionModal((prev) => ({ ...prev, notes: e.target.value }))}
+                    />
+                  </div>
+                </div>
+                <div className="uni-modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => setActionModal({ open: false, type: '', supervisor: null, notes: '' })}
+                    disabled={actionLoading}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn btn-sm ${actionModal.type === 'approved' ? 'btn-primary' : 'btn-danger'}`}
+                    style={actionModal.type === 'approved' ? { background: '#10b981', borderColor: '#10b981' } : {}}
+                    onClick={handleConfirmAction}
+                    disabled={actionLoading}
+                  >
+                    <span>{actionLoading ? 'Processing' : `Confirm ${actionModal.type === 'approved' ? 'Approval' : 'Rejection'}`}</span>
+                    {showActionLoader && <InlineLoader />}
+                  </button>
+                </div>
               </div>
-            </div>
-            <div className="uni-modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={() => setActionModal({ open: false, type: '', supervisor: null, notes: '' })}
-                disabled={actionLoading}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className={`btn btn-sm ${actionModal.type === 'approved' ? 'btn-primary' : 'btn-danger'}`}
-                style={actionModal.type === 'approved' ? { background: '#10b981', borderColor: '#10b981' } : {}}
-                onClick={handleConfirmAction}
-                disabled={actionLoading}
-              >
-                <span>{actionLoading ? 'Processing' : `Confirm ${actionModal.type === 'approved' ? 'Approval' : 'Rejection'}`}</span>
-                {showActionLoader && <InlineLoader />}
-              </button>
-            </div>
-          </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Details View Modal */}
-      {selectedSupervisor && (
-        <div className="uni-modal-overlay" onClick={() => setSelectedSupervisor(null)}>
-          <div className="uni-modal-card" onClick={(e) => e.stopPropagation()}>
-            <div className="uni-modal-header">
-              <h3 className="uni-modal-title">Supervisor Profile</h3>
-              <button type="button" className="uni-modal-close" onClick={() => setSelectedSupervisor(null)}>
-                &times;
-              </button>
-            </div>
-            <div className="uni-modal-body">
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <div>
-                  <span className="card-label-small">Full Name</span>
-                  <div style={{ fontWeight: 700, color: 'var(--navy-dark)', fontSize: '0.98rem' }}>
-                    {selectedSupervisor.fullName}
+          {selectedSupervisor && createPortal(
+            <div className="uni-modal-overlay" onClick={() => setSelectedSupervisor(null)} role="dialog" aria-modal="true">
+              <div className="uni-modal-card" onClick={(e) => e.stopPropagation()}>
+                <div className="uni-modal-header">
+                  <h3 className="uni-modal-title">Supervisor Profile</h3>
+                  <button type="button" className="uni-modal-close" onClick={() => setSelectedSupervisor(null)}>
+                    &times;
+                  </button>
+                </div>
+                <div className="uni-modal-body">
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div>
+                      <span className="card-label-small">Full Name</span>
+                      <div style={{ fontWeight: 700, color: 'var(--navy-dark)', fontSize: '0.98rem' }}>
+                        {selectedSupervisor.fullName}
+                      </div>
+                    </div>
+                    <div>
+                      <span className="card-label-small">Staff Registration ID</span>
+                      <div>
+                        <code style={{ background: '#f1f5f9', padding: '0.2rem 0.5rem', borderRadius: 4, fontWeight: 700 }}>
+                          {selectedSupervisor.staffRegNo}
+                        </code>
+                      </div>
+                    </div>
+                    <div>
+                      <span className="card-label-small">Institutional Email</span>
+                      <div style={{ color: '#334155' }}>{selectedSupervisor.email}</div>
+                    </div>
+                    <div>
+                      <span className="card-label-small">Department</span>
+                      <div style={{ color: '#334155' }}>{selectedSupervisor.department || 'Department of Computing'}</div>
+                    </div>
+                    <div>
+                      <span className="card-label-small">Account Status</span>
+                      <div>
+                        <span className={`badge-status badge-${selectedSupervisor.joinStatus}`}>
+                          {selectedSupervisor.joinStatus}
+                        </span>
+                      </div>
+                    </div>
+                    <div>
+                      <span className="card-label-small">Joined Date</span>
+                      <div style={{ color: '#64748b', fontSize: '0.85rem' }}>
+                        {new Date(selectedSupervisor.createdAt).toLocaleDateString()}
+                      </div>
+                    </div>
                   </div>
+                  {selectedSupervisor.reviewNotes && (
+                    <div style={{ marginTop: '0.5rem', background: '#f8fafc', padding: '0.75rem 1rem', borderRadius: 8, border: '1px solid #e2e8f0' }}>
+                      <span className="card-label-small" style={{ marginBottom: '2px', display: 'block' }}>Head Review Notes</span>
+                      <p style={{ margin: 0, fontSize: '0.88rem', color: '#475569' }}>
+                        {selectedSupervisor.reviewNotes}
+                      </p>
+                    </div>
+                  )}
                 </div>
-                <div>
-                  <span className="card-label-small">Staff Registration ID</span>
-                  <div>
-                    <code style={{ background: '#f1f5f9', padding: '0.2rem 0.5rem', borderRadius: 4, fontWeight: 700 }}>
-                      {selectedSupervisor.staffRegNo}
-                    </code>
-                  </div>
-                </div>
-                <div>
-                  <span className="card-label-small">Institutional Email</span>
-                  <div style={{ color: '#334155' }}>{selectedSupervisor.email}</div>
-                </div>
-                <div>
-                  <span className="card-label-small">Department</span>
-                  <div style={{ color: '#334155' }}>{selectedSupervisor.department || 'Department of Computing'}</div>
-                </div>
-                <div>
-                  <span className="card-label-small">Account Status</span>
-                  <div>
-                    <span className={`badge-status badge-${selectedSupervisor.joinStatus}`}>
-                      {selectedSupervisor.joinStatus}
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <span className="card-label-small">Joined Date</span>
-                  <div style={{ color: '#64748b', fontSize: '0.85rem' }}>
-                    {new Date(selectedSupervisor.createdAt).toLocaleDateString()}
-                  </div>
+                <div className="uni-modal-footer">
+                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => setSelectedSupervisor(null)}>
+                    Close
+                  </button>
                 </div>
               </div>
-              {selectedSupervisor.reviewNotes && (
-                <div style={{ marginTop: '0.5rem', background: '#f8fafc', padding: '0.75rem 1rem', borderRadius: 8, border: '1px solid #e2e8f0' }}>
-                  <span className="card-label-small" style={{ marginBottom: '2px', display: 'block' }}>Head Review Notes</span>
-                  <p style={{ margin: 0, fontSize: '0.88rem', color: '#475569' }}>
-                    {selectedSupervisor.reviewNotes}
-                  </p>
-                </div>
-              )}
-            </div>
-            <div className="uni-modal-footer">
-              <button type="button" className="btn btn-secondary btn-sm" onClick={() => setSelectedSupervisor(null)}>
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
