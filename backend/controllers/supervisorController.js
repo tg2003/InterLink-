@@ -10,7 +10,7 @@ exports.getStatusAndProfile = async (req, res) => {
   try {
     const supervisor = await Supervisor.findById(req.supervisor._id)
       .select("-password")
-      .populate("university", "universityName headName headEmail contactNumber address status");
+      .populate("university", "universityName headName headEmail contactNumber address status profilePicture");
 
     if (!supervisor) {
       return res.status(404).json({
@@ -76,7 +76,7 @@ exports.sendJoinRequest = async (req, res) => {
 
     const populatedSupervisor = await Supervisor.findById(supervisor._id)
       .select("-password")
-      .populate("university", "universityName headName headEmail contactNumber address");
+      .populate("university", "universityName headName headEmail contactNumber address profilePicture status");
 
     return res.json({
       success: true,
@@ -376,7 +376,7 @@ exports.updateProfile = async (req, res) => {
 
     const updated = await Supervisor.findById(supervisor._id)
       .select("-password")
-      .populate("university", "universityName headName headEmail contactNumber address");
+      .populate("university", "universityName headName headEmail contactNumber address profilePicture status");
 
     return res.json({
       success: true,

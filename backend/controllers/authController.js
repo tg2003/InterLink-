@@ -57,13 +57,13 @@ function generateToken(user, role, displayName, userEmail) {
 exports.getApprovedUniversities = async (req, res) => {
   try {
     const universities = await University.find({ status: "approved" })
-      .select("_id universityName")
+      .select("_id universityName profilePicture")
       .sort({ universityName: 1 });
 
     // Fallback: If no universities are explicitly approved yet, return all universities
     if (universities.length === 0) {
       const allUniversities = await University.find()
-        .select("_id universityName")
+        .select("_id universityName profilePicture")
         .sort({ universityName: 1 });
       return res.json({ success: true, universities: allUniversities });
     }
@@ -438,7 +438,7 @@ exports.login = async (req, res) => {
       Admin.findOne({ email: { $in: [normalizedEmail, rawEmail] } }),
       University.findOne({ headEmail: { $in: [normalizedEmail, rawEmail] } }),
       Supervisor.findOne({ email: { $in: [normalizedEmail, rawEmail] } }),
-      Student.findOne({ email: { $in: [normalizedEmail, rawEmail] } }).populate("university", "universityName"),
+      Student.findOne({ email: { $in: [normalizedEmail, rawEmail] } }).populate("university", "universityName profilePicture"),
       Employer.findOne({ email: { $in: [normalizedEmail, rawEmail] } }),
     ]);
 
@@ -481,7 +481,7 @@ exports.login = async (req, res) => {
         Admin.findOne({ email: regex }),
         University.findOne({ headEmail: regex }),
         Supervisor.findOne({ email: regex }),
-        Student.findOne({ email: regex }).populate("university", "universityName"),
+        Student.findOne({ email: regex }).populate("university", "universityName profilePicture"),
         Employer.findOne({ email: regex }),
       ]);
 
@@ -575,7 +575,7 @@ exports.getCurrentUser = async (req, res) => {
     let userData = { ...req.user };
 
     if (req.user && req.user.role === "student") {
-      const student = await Student.findById(req.user.id).select("-password").populate("university", "universityName");
+      const student = await Student.findById(req.user.id).select("-password").populate("university", "universityName profilePicture");
       if (student) {
         userData = {
           ...userData,
@@ -616,7 +616,7 @@ exports.getCurrentUser = async (req, res) => {
     if (req.user && req.user.role === "supervisor") {
       const supervisor = await Supervisor.findById(req.user.id)
         .select("-password")
-        .populate("university", "universityName headName headEmail contactNumber address");
+        .populate("university", "universityName headName headEmail contactNumber address profilePicture status");
       if (supervisor) {
         userData = {
           ...userData,
