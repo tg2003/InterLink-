@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import universityService from '../../../services/universityService';
 import LoadingState from '../../../components/LoadingState';
 import './University.css';
@@ -47,6 +48,27 @@ export default function UniversityStudents({ showToast }) {
     }
   };
 
+  // Lock body scroll and close on Escape when modal is open
+  useEffect(() => {
+    if (!selectedStudentLogs) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setSelectedStudentLogs(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedStudentLogs]);
+
   return (
     <div className="university-view-container">
       {/* Header */}
@@ -54,10 +76,10 @@ export default function UniversityStudents({ showToast }) {
         <div>
           <h2 className="admin-section-title">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ color: 'var(--blue-primary)' }}>
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
             Enrolled Student Interns Directory
           </h2>
@@ -71,8 +93,8 @@ export default function UniversityStudents({ showToast }) {
       <div className="admin-filter-bar">
         <div className="admin-search-wrapper">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#94a3b8" strokeWidth="2">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
           <input
             type="text"
@@ -112,8 +134,8 @@ export default function UniversityStudents({ showToast }) {
           <div className="admin-empty-state">
             <div className="admin-empty-icon">
               <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
               </svg>
             </div>
             <h4 style={{ margin: '0 0 0.4rem', color: 'var(--navy-dark)' }}>No Students Found</h4>
@@ -179,8 +201,8 @@ export default function UniversityStudents({ showToast }) {
                         style={{ textDecoration: 'none' }}
                       >
                         <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                          <polyline points="14 2 14 8 20 8"/>
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                          <polyline points="14 2 14 8 20 8" />
                         </svg>
                         View CV
                       </a>
@@ -206,61 +228,62 @@ export default function UniversityStudents({ showToast }) {
       </div>
 
       {/* Progress Logs Modal for Selected Student */}
-      {selectedStudentLogs && (
-        <div className="uni-modal-overlay" onClick={() => setSelectedStudentLogs(null)}>
-          <div className="uni-modal-card" style={{ maxWidth: '680px' }} onClick={(e) => e.stopPropagation()}>
-            <div className="uni-modal-header">
-              <div>
-                <h3 className="uni-modal-title">
-                  Daily Progress Logs: {selectedStudentLogs.student?.fullName}
-                </h3>
-                <span style={{ fontSize: '0.8rem', color: '#64748b', display: 'block', marginTop: '2px' }}>
-                  {selectedStudentLogs.student?.email} • <span className="badge-category">{selectedStudentLogs.student?.mainCategory}</span>
-                </span>
-              </div>
-              <button type="button" className="uni-modal-close" onClick={() => setSelectedStudentLogs(null)}>
-                &times;
-              </button>
-            </div>
-            <div className="uni-modal-body" style={{ maxHeight: '62vh' }}>
-              {logsLoading ? (
-                <LoadingState text="Loading student logs..." padding="2rem" />
-              ) : selectedStudentLogs.logs.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '2.5rem', color: '#64748b' }}>
-                  <p>This student has not submitted any daily progress logs yet.</p>
+          {selectedStudentLogs && createPortal(
+            <div className="uni-modal-overlay" onClick={() => setSelectedStudentLogs(null)} role="dialog" aria-modal="true">
+              <div className="uni-modal-card" style={{ maxWidth: '680px' }} onClick={(e) => e.stopPropagation()}>
+                <div className="uni-modal-header">
+                  <div>
+                    <h3 className="uni-modal-title">
+                      Daily Progress Logs: {selectedStudentLogs.student?.fullName}
+                    </h3>
+                    <span style={{ fontSize: '0.8rem', color: '#64748b', display: 'block', marginTop: '2px' }}>
+                      {selectedStudentLogs.student?.email} • <span className="badge-category">{selectedStudentLogs.student?.mainCategory}</span>
+                    </span>
+                  </div>
+                  <button type="button" className="uni-modal-close" onClick={() => setSelectedStudentLogs(null)}>
+                    &times;
+                  </button>
                 </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                  {selectedStudentLogs.logs.map((log, idx) => (
-                    <div key={log._id || idx} className="uni-log-card" style={{ borderLeftColor: '#0ea5e9' }}>
-                      <div className="uni-log-header">
-                        <span className="uni-date-badge">
-                          📅 {new Date(log.date || log.createdAt).toLocaleDateString()}
-                        </span>
-                        <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
-                          Recorded {new Date(log.createdAt || log.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
-                      <p className="uni-log-body">
-                        {log.description}
-                      </p>
-                      {log.supervisorFeedback && (
-                        <div className="uni-log-feedback">
-                          <strong>Supervisor Feedback:</strong> {log.supervisorFeedback}
-                        </div>
-                      )}
+                <div className="uni-modal-body" style={{ maxHeight: '62vh' }}>
+                  {logsLoading ? (
+                    <LoadingState text="Loading student logs..." padding="2rem" />
+                  ) : selectedStudentLogs.logs.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '2.5rem', color: '#64748b' }}>
+                      <p>This student has not submitted any daily progress logs yet.</p>
                     </div>
-                  ))}
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                      {selectedStudentLogs.logs.map((log, idx) => (
+                        <div key={log._id || idx} className="uni-log-card" style={{ borderLeftColor: '#0ea5e9' }}>
+                          <div className="uni-log-header">
+                            <span className="uni-date-badge">
+                              📅 {new Date(log.date || log.createdAt).toLocaleDateString()}
+                            </span>
+                            <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
+                              Recorded {new Date(log.createdAt || log.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                          <p className="uni-log-body">
+                            {log.description}
+                          </p>
+                          {log.supervisorFeedback && (
+                            <div className="uni-log-feedback">
+                              <strong>Supervisor Feedback:</strong> {log.supervisorFeedback}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            <div className="uni-modal-footer">
-              <button type="button" className="btn btn-secondary btn-sm" onClick={() => setSelectedStudentLogs(null)}>
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
+                <div className="uni-modal-footer">
+                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => setSelectedStudentLogs(null)}>
+                    Close
+                  </button>
+                </div>
+              </div>
+        </div>,
+        document.body
       )}
     </div>
   );
